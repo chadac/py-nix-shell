@@ -48,8 +48,11 @@ def _cmd(
     return subprocess.check_output(["nix"] + cmds + args).decode()
 
 
-def build(**params: Unpack[NixBuildArgs]):
-    return _cmd(**params)
+def build(no_link: bool = False, **params: Unpack[NixBuildArgs]):
+    extra_args = []
+    if no_link:
+        extra_args += ["--no-link"]
+    return _cmd(extra_args=extra_args, **params)
 
 
 def evaluate(

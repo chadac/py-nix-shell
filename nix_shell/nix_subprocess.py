@@ -13,7 +13,7 @@ from nix_shell import _nix
 
 
 def gen_shell_script(**params: Unpack[_nix.NixBuildArgs]) -> str:
-    _nix.build(**params)
+    _nix.build(no_link=True, **params)
     result = _nix.derivation.show(**params)
     derivs = json.loads(result)
     deriv = derivs[next(iter(derivs.keys()))]
