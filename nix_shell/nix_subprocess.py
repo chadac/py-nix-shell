@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from functools import cache
 import json
 import os
 from pathlib import Path
 import subprocess
 import tempfile
-from typing import Any, TypedDict, Unpack
+from typing import Any, Self, TypedDict, Unpack
 
 from nix_shell import _nix
 
@@ -31,7 +32,8 @@ class NixSubprocess:
     shell_path: Path
 
     @classmethod
-    def build(cls, **params: Unpack[_nix.NixBuildArgs]):
+    @cache
+    def build(cls, **params: Unpack[_nix.NixBuildArgs]) -> Self:
         shell_script = gen_shell_script(**params)
         shell_path = tempfile.NamedTemporaryFile(delete=False)
         shell_path.write(shell_script.encode())
@@ -53,14 +55,30 @@ class NixSubprocess:
             new_cmd = f"{self.shell_path} {cmd}"
         return ([new_cmd], new_kwargs)
 
-    def run(self, cmd: list[str] | str, **kwargs) -> subprocess.CompletedProcess:
+    def run(self, cmd: list[str] | str, **kwargs) -> subprocess.CompletedProcess[bytes] | subprocess.CompletedProcess[str]:
         new_args, new_kwargs = self._process_args(cmd, **kwargs)
         return subprocess.run(*new_args, **new_kwargs)
 
-    def check_output(self, cmd: list[str] | str, **kwargs) -> bytes:
+    def check_output(self, cmd: list[str] | str, **kwargs) -> bytes | str:
         new_args, new_kwargs = self._process_args(cmd, **kwargs)
         return subprocess.check_output(*new_args, **new_kwargs)
 
-    def Popen(self, cmd: list[str] | str, **kwargs) -> subprocess.Popen[str]:
+    def Popen(self, cmd: list[str] | str, **kwargs) -> subprocess.Popen[str] | subprocess.Popen[bytes]:
         new_args, new_kwargs = self._process_args(cmd, **kwargs)
         return subprocess.Popen(*new_args, **new_kwargs)
+
+    def call(self, cmd: list[str] | str, **kwargs) -> int:
+        new_args, new_kwargs = self._process_args(cmd, **kwargs)
+        return subprocess.call(*new_args, **new_kwargs)
+
+    def check_call(self, cmd: list[str] | str, **kwargs) -> int:
+        new_args, new_kwargs = self._process_args(cmd, **kwargs)
+        return subprocess.check_call(*new_args, **new_kwargs)
+
+    def getoutput(self, cmd: list[str] | str, **kwargs) -> str:
+        new_args, new_kwargs = self._process_args(cmd, **kwargs)
+        return subprocess.getoutput(*new_args, **new_kwargs)
+
+    def getstatusoutput(self, cmd: list[str] | str, **kwargs) -> tuple[int, str]:
+        new_args, new_kwargs = self._process_args(cmd, **kwargs)
+        return subprocess.getstatusoutput(*new_args, **new_kwargs)

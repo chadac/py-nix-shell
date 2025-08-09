@@ -1,3 +1,4 @@
+from functools import cache
 from pathlib import Path
 from typing import NotRequired, TypedDict, Unpack
 from nix_shell import nixlang, _nix
@@ -67,16 +68,17 @@ def mk_shell_expr(
             kwargs.get("flake_lock_name", "nixpkgs")
         )
         nixpkgs_args = to_fetch_tree(flake_ref)
-    elif kwargs.get("use_global_nixpkgs", False):
+    else:
+    # elif kwargs.get("use_global_nixpkgs", False):
         flake_ref = get_impure_nixpkgs_ref()
         nixpkgs_args = to_fetch_tree(flake_ref)
-    else:
-        # TODO: Lock to the `flake.lock` in this package
-        raise NotImplementedError()
+    # else:
+    #     # TODO: Lock to the `flake.lock` in this package
+    #     raise NotImplementedError()
 
     expr = nixlang.let(
         **nixpkgs_args,
-        pkgs=nixlang.call("import", "nixpkgs", nixlang.attrs(
+        pkgs=nixlang.call("import", nixlang.raw("nixpkgs"), nixlang.attrs(
             system=_nix.current_system(),
         )),
         in_=nixlang.call("pkgs.mkShell", nixlang.attrs(
@@ -84,7 +86,7 @@ def mk_shell_expr(
             inputsFrom=_pkgs_list(kwargs.get("inputs_from", [])),
             buildInputs=_pkgs_list(kwargs.get("build_inputs", [])),
             shellHook=f"""
-export LD_LIBRARY_PATH=${{pkgs.lib.makeLibraryPath ({_pkgs_list(kwargs.get('library_path', []))})}}:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=${{pkgs.lib.makeLibraryPath ({nixlang.dumps(_pkgs_list(kwargs.get('library_path', [])))})}}:$LD_LIBRARY_PATH
 """ + kwargs.get("shell_hook", "")
         ))
     )

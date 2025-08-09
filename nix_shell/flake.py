@@ -16,19 +16,20 @@ def to_fetch_tree(ref: FlakeRef) -> dict[str, NixValue]:
     else:
         tree_ref  = ref
     return {
-        "nixpkgsTree": nixlang.call("builtins.getTree", ref),
-        "nixpkgs": nixlang.call(
-            "builtins.getFlake",
-            "path:${nixpkgsTree.outPath}"
-        )
+        "nixpkgsTree": nixlang.call("builtins.fetchTree", ref),
+        "nixpkgs": nixlang.raw("nixpkgsTree.outPath"),
     }
 
 
 def get_ref_from_lockfile(flake_lock: Path | str, nixpkgs: str = "nixpkgs") -> dict[str, NixValue]:
     with open(flake_lock, "r") as f:
         lock = json.load(f)
-    return lock["nodes"][nixpkgs]["locked"]
+    locked = dict(lock["nodes"][nixpkgs]["locked"])
+    locked.pop("__final", None)
+    return locked
 
 
 def get_impure_nixpkgs_ref() -> dict:
-    return _nix.flake.metadata("nixpkgs")["locked"]
+    locked = dict(_nix.flake.metadata("nixpkgs")["locked"])
+    locked.pop("__final", None)
+    return locked

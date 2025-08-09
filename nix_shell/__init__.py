@@ -10,13 +10,18 @@ def _infer_shell(*args, **kwargs) -> tuple[NixSubprocess, Any, Any]:
     shell_cmd: Callable[..., NixSubprocess]
     shell_kwargs_keys: set[str]
     if "flake" in kwargs:
-        shell_kwargs_keys = set(get_type_hints(FlakeRefParams).keys())
+        shell_kwargs_keys = set(FlakeRefParams.__annotations__.keys())
         shell_cmd = from_flake
     elif "nix_file" in kwargs:
-        shell_kwargs_keys = set(get_type_hints(MkNixParams).keys())
+        shell_kwargs_keys = set(MkNixParams.__annotations__.keys())
         shell_cmd = mk_nix
     else:
-        shell_kwargs_keys = set(get_type_hints(MkShellParams).keys())
+        if "packages" not in kwargs:
+            if isinstance(args[0], list):
+                kwargs["packages"] = [args[0][0]]
+            else:
+                kwargs["packages"] = [args[0].split(" ", 1)[0]]
+        shell_kwargs_keys = set(MkShellParams.__annotations__.keys())
         shell_cmd = mk_shell
     shell_kwargs = {key: value for key, value in kwargs.items() if key in shell_kwargs_keys}
     nix = shell_cmd(**shell_kwargs)

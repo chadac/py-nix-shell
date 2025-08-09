@@ -50,15 +50,22 @@ def with_(var: str, expr: NixValue) -> With:
     return With(var, expr)
 
 
-NixValue = str | int | float | dict[str, "NixValue"] | Let | Raw | Call | list["NixValue"] | With
+NixValue = bool | str | int | float | dict[str, "NixValue"] | Let | Raw | Call | list["NixValue"] | With
 
 
 def dumps(n: NixValue) -> str:
     match n:
+        case True:
+            return "true"
+        case False:
+            return "false"
         case int() | float():
             return str(n)
         case str():
-            return f'"{n}"'
+            if "\n" in n:
+                return f"''{n}''"
+            else:
+                return f'"{n}"'
         case dict():
             return _attrset(n)
         case list():
