@@ -6,7 +6,6 @@ from pathlib import Path
 from nix_shell import _nix, nixlang
 from nix_shell.nixlang import NixValue
 
-
 FlakeRef = str | dict[str, NixValue]
 
 
@@ -14,14 +13,16 @@ def to_fetch_tree(ref: FlakeRef) -> dict[str, NixValue]:
     if isinstance(ref, str):
         tree_ref = _nix.flake.metadata(ref)["locked"]
     else:
-        tree_ref  = ref
+        tree_ref = ref
     return {
-        "nixpkgsTree": nixlang.call("builtins.fetchTree", ref),
+        "nixpkgsTree": nixlang.call("builtins.fetchTree", tree_ref),
         "nixpkgs": nixlang.raw("nixpkgsTree.outPath"),
     }
 
 
-def get_ref_from_lockfile(flake_lock: Path | str, nixpkgs: str = "nixpkgs") -> dict[str, NixValue]:
+def get_ref_from_lockfile(
+    flake_lock: Path | str, nixpkgs: str = "nixpkgs"
+) -> dict[str, NixValue]:
     with open(flake_lock, "r") as f:
         lock = json.load(f)
     locked = dict(lock["nodes"][nixpkgs]["locked"])

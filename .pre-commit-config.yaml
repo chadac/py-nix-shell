@@ -1,0 +1,21 @@
+repos:
+  - repo: local
+    hooks:
+    - id: ruff-check-fix
+      name: ruff check --fix
+      entry: 'just ruff-check-fix'
+      language: system
+      stages: [pre-commit]
+      files: '(nix_shell|tests)/.*'
+    - id: mypy
+      name: mypy
+      entry: 'just mypy'
+      language: system
+      stages: [pre-commit]
+      files: '(nix_shell|tests)/.*'
+    - id: format
+      name: format
+      entry: 'just format'
+      language: system
+      files: '(nix_shell|tests)/.*'
+      stages: [pre-commit]

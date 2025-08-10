@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-import textwrap
 
 
 @dataclass(frozen=True)
@@ -50,7 +49,18 @@ def with_(var: str, expr: NixValue) -> With:
     return With(var, expr)
 
 
-NixValue = bool | str | int | float | dict[str, "NixValue"] | Let | Raw | Call | list["NixValue"] | With
+NixValue = (
+    bool
+    | str
+    | int
+    | float
+    | dict[str, "NixValue"]
+    | Let
+    | Raw
+    | Call
+    | list["NixValue"]
+    | With
+)
 
 
 def dumps(n: NixValue) -> str:
@@ -86,24 +96,17 @@ def _dumps(n: NixValue) -> str:
 
 
 def _attrset(d: dict[str, NixValue]) -> str:
-    return "{ " + " ".join([
-        f"{key} = {dumps(value)};"
-        for key, value in d.items()
-    ]) + " }"
+    return (
+        "{ " + " ".join([f"{key} = {dumps(value)};" for key, value in d.items()]) + " }"
+    )
 
 
-def _let(l: Let) -> str:
-    exprs = "\n".join([
-        f"  {key} = {dumps(n)};" for key, n in l.exprs.items()
-    ])
+def _let(let: Let) -> str:
+    exprs = "\n".join([f"  {key} = {dumps(n)};" for key, n in let.exprs.items()])
     return f"""let
 {exprs}
-in {dumps(l.result)}"""
+in {dumps(let.result)}"""
 
 
 def _call(c: Call):
-    return " ".join(
-        [dumps(c.func)] + [
-            _dumps(arg) for arg in c.args
-        ]
-    )
+    return " ".join([dumps(c.func)] + [_dumps(arg) for arg in c.args])

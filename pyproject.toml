@@ -16,3 +16,9 @@ dev = [
     "pytest>=8.4.1",
     "ruff>=0.12.5",
 ]
+
+[tool.hatch.build.targets.wheel.force-include]
+"flake.lock" = "nix_shell/flake.lock"
+
+[tool.mypy]
+modules = ["nix_shell", "tests"]
