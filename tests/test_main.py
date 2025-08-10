@@ -1,6 +1,6 @@
-import pytest
-
 from pathlib import Path
+
+import pytest
 
 import nix_shell
 
@@ -25,5 +25,5 @@ def test_can_use_lockfile():
     nix_shell.run(
         ["curl", "https://google.com"],
         packages=["curl", "openssl"],
-        flake_lock=Path(__file__).parent.parent / "flake.lock"
+        flake_lock=Path(__file__).parent.parent / "flake.lock",
     )

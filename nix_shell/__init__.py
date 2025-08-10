@@ -1,9 +1,15 @@
 import subprocess
-from typing import Any, Callable, get_type_hints
+from typing import Any, Callable
 
-from nix_shell.builders import FlakeRefParams, MkNixParams, MkShellParams, from_flake, mk_nix
+from nix_shell.builders import (
+    FlakeRefParams,
+    MkNixParams,
+    MkShellParams,
+    from_flake,
+    mk_nix,
+    mk_shell,
+)
 from nix_shell.nix_subprocess import NixSubprocess
-from nix_shell.builders import mk_shell
 
 
 def _infer_shell(*args, **kwargs) -> tuple[NixSubprocess, Any, Any]:
@@ -23,9 +29,13 @@ def _infer_shell(*args, **kwargs) -> tuple[NixSubprocess, Any, Any]:
                 kwargs["packages"] = [args[0].split(" ", 1)[0]]
         shell_kwargs_keys = set(MkShellParams.__annotations__.keys())
         shell_cmd = mk_shell
-    shell_kwargs = {key: value for key, value in kwargs.items() if key in shell_kwargs_keys}
+    shell_kwargs = {
+        key: value for key, value in kwargs.items() if key in shell_kwargs_keys
+    }
     nix = shell_cmd(**shell_kwargs)
-    new_kwargs = {key: value for key, value in kwargs.items() if key not in shell_kwargs_keys}
+    new_kwargs = {
+        key: value for key, value in kwargs.items() if key not in shell_kwargs_keys
+    }
     return nix, args, new_kwargs
 
 
@@ -34,15 +44,14 @@ def run(*args, **kwargs) -> subprocess.CompletedProcess:
     return nix.run(*new_args, **new_kwargs)
 
 
-def check_output(*args, **kwargs) -> bytes:
+def check_output(*args, **kwargs) -> bytes | str:
     nix, new_args, new_kwargs = _infer_shell(*args, **kwargs)
     return nix.check_output(*new_args, **new_kwargs)
 
 
-def Popen(*args, **kwargs) -> subprocess.Popen[str]:
+def Popen(*args, **kwargs) -> subprocess.Popen[str] | subprocess.Popen[bytes]:
     nix, new_args, new_kwargs = _infer_shell(*args, **kwargs)
     return nix.Popen(*new_args, **new_kwargs)
-
 
 
 __all__ = [

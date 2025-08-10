@@ -1,13 +1,13 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
-from functools import cache
 import json
 import os
-from pathlib import Path
 import subprocess
 import tempfile
-from typing import Any, Self, TypedDict, Unpack
+from dataclasses import dataclass
+from functools import cache
+from pathlib import Path
+from typing import Any, Self, Unpack
 
 from nix_shell import _nix
 
@@ -48,14 +48,16 @@ class NixSubprocess:
                 "env": kwargs.get("env", {}),
             },
         }
-        new_cmd = None
+        new_cmd: str | list[str]
         if isinstance(cmd, list):
-            new_cmd = [self.shell_path] + cmd
+            new_cmd = [str(self.shell_path)] + cmd
         else:
             new_cmd = f"{self.shell_path} {cmd}"
         return ([new_cmd], new_kwargs)
 
-    def run(self, cmd: list[str] | str, **kwargs) -> subprocess.CompletedProcess[bytes] | subprocess.CompletedProcess[str]:
+    def run(
+        self, cmd: list[str] | str, **kwargs
+    ) -> subprocess.CompletedProcess[bytes] | subprocess.CompletedProcess[str]:
         new_args, new_kwargs = self._process_args(cmd, **kwargs)
         return subprocess.run(*new_args, **new_kwargs)
 
@@ -63,7 +65,9 @@ class NixSubprocess:
         new_args, new_kwargs = self._process_args(cmd, **kwargs)
         return subprocess.check_output(*new_args, **new_kwargs)
 
-    def Popen(self, cmd: list[str] | str, **kwargs) -> subprocess.Popen[str] | subprocess.Popen[bytes]:
+    def Popen(
+        self, cmd: list[str] | str, **kwargs
+    ) -> subprocess.Popen[str] | subprocess.Popen[bytes]:
         new_args, new_kwargs = self._process_args(cmd, **kwargs)
         return subprocess.Popen(*new_args, **new_kwargs)
 

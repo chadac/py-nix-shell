@@ -1,7 +1,7 @@
-from functools import cache, cached_property
 import json
-from pathlib import Path
 import subprocess
+from functools import cache
+from pathlib import Path
 from typing import NotRequired, TypedDict, Unpack
 
 
@@ -11,7 +11,7 @@ class NixBuildArgs(TypedDict):
     ref: NotRequired[str]
     expr: NotRequired[str]
     impure: NotRequired[bool]
-    include: NotRequired[dict[str, str]]
+    include: NotRequired[tuple[tuple[str, str], ...]]
 
 
 def _parse_args(
@@ -28,7 +28,7 @@ def _parse_args(
             args += [params["installable"]]
     if params.get("impure", False):
         args += ["--impure"]
-    for key, value in params.get("include", {}).items():
+    for key, value in params.get("include", []):
         args += ["-I", f"{key}={value}"]
     return args
 
@@ -84,6 +84,8 @@ class derivation:
 class flake:
     @staticmethod
     def metadata(flake_ref: str) -> dict:
-        return json.loads(subprocess.check_output(
-            ["nix", "flake", "metadata", flake_ref, "--json"]
-        ).decode())
+        return json.loads(
+            subprocess.check_output(
+                ["nix", "flake", "metadata", flake_ref, "--json"]
+            ).decode()
+        )

@@ -5,4 +5,5 @@
     package = pkgs.python313;
     uv.enable = true;
   };
+  packages = with pkgs; [ just pre-commit nix ];
 }
