@@ -42,6 +42,16 @@
               <ul class="current">
                 <li class="toctree-l1 current"><a class="reference internal current" href="#">Home</a>
     <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#usage">Usage</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#details">Details</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#versioning">Versioning</a>
+    </li>
+        </ul>
+    </li>
     </ul>
                 </li>
               </ul>
@@ -49,10 +59,8 @@
                 <li class="toctree-l1"><a class="reference internal" href="getting-started/">Getting Started</a>
                 </li>
               </ul>
-              <ul class="current">
-                <li class="toctree-l1 current"><a class="reference internal current" href="#">Home</a>
-    <ul class="current">
-    </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="api/">API Documentation</a>
                 </li>
               </ul>
       </div>
@@ -71,7 +79,6 @@
     <li><a href="." class="icon icon-home" aria-label="Docs"></a></li>
       <li class="breadcrumb-item active">Home</li>
     <li class="wy-breadcrumbs-aside">
-          <a href="https://github.com/chadac/py-nix-shell/edit/master/docs/index.md" class="icon icon-github"> Edit on GitHub</a>
     </li>
   </ul>
   <hr/>
@@ -79,41 +86,65 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <p><a id="nix_shell.exceptions"></a></p>
-<h1 id="nix_shellexceptions">nix_shell.exceptions</h1>
-<p><a id="nix_shell.constants"></a></p>
-<h1 id="nix_shellconstants">nix_shell.constants</h1>
-<p><a id="nix_shell.flake"></a></p>
-<h1 id="nix_shellflake">nix_shell.flake</h1>
-<p><a id="nix_shell.nix_subprocess"></a></p>
-<h1 id="nix_shellnix_subprocess">nix_shell.nix_subprocess</h1>
-<p><a id="nix_shell._nix"></a></p>
-<h1 id="nix_shell_nix">nix_shell._nix</h1>
-<p>Interface for invoking the Nix CLI from Python.</p>
-<p><a id="nix_shell.builders"></a></p>
-<h1 id="nix_shellbuilders">nix_shell.builders</h1>
-<p><a id="nix_shell.builders.FlakeRefParams"></a></p>
-<h2 id="flakerefparams-objects">FlakeRefParams Objects</h2>
-<pre><code class="language-python">class FlakeRefParams(TypedDict)
+                <h1 id="py-nix-shell">py-nix-shell</h1>
+<p>Invoke commands sourced from Nix. This is mainly intended for those
+who vend cli tools inside environments that often support Nix and need
+to be able to reproducibly invoke those tools.</p>
+<p>If folks don't have Nix, it will attempt to run the command anyways,
+and then provide an information install-error style message (either
+packages to install or a suggestion to install Nix).</p>
+<p>This is a drop-in replacement for <code>subprocess</code> -- so you can
+substitute your calls from <code>subprocess.&lt;method&gt;</code> to
+<code>nix_shell.&lt;method&gt;</code>.</p>
+<p>If Nix is not installed, this (by default) falls back to a non-Nix shell.</p>
+<h2 id="installation">Installation</h2>
+<pre><code class="language-bash">pip install nix-shell
 </code></pre>
-<p>Parameters to provide for building Flake shells.</p>
-<p><a id="nix_shell.builders.from_flake"></a></p>
-<h4 id="from_flake">from_flake</h4>
-<pre><code class="language-python">def from_flake(**kwargs: Unpack[FlakeRefParams]) -&gt; NixSubprocess
+<h2 id="usage">Usage</h2>
+<pre><code class="language-python">import nix_shell
+
+# nix_shell supports existing subprocess commands
+
+# if the command name matches the `nixpkgs` name, install that by default
+nix_shell.run([&quot;curl&quot;, &quot;https://google.com&quot;, &quot;--insecure&quot;])
+
+# you can manually specify nix packages to install
+nix_shell.run([&quot;curl&quot;, &quot;https://google.com&quot;], packages=[&quot;curl&quot;, &quot;openssl&quot;])
+
+# use a dev environment from a flake
+nix_shell.run([&quot;curl&quot;, &quot;https://google.com&quot;], flake=&quot;github:chadac/py-nix-shell#sample-curl-env&quot;)
+
+# or, just use the `nixpkgs` version from a `flake.lock` file
+nix_shell.run([&quot;curl&quot;, &quot;https://google.com&quot;], packages=[&quot;curl&quot;, &quot;openssl&quot;], flake_lock=Path(&quot;./my/flake.lock&quot;))
 </code></pre>
-<p>Create a Nix shell from a flake.</p>
-<p><strong>Arguments</strong>:</p>
-<ul>
-<li><code>flake</code>: Flake reference to use for shell.</li>
-</ul>
-<p><a id="nix_shell.nixlang"></a></p>
-<h1 id="nix_shellnixlang">nix_shell.nixlang</h1>
-<p>Deserializer for Nix language constructs.</p>
+<p>You can use <code>run</code>, <code>check_output</code>, <code>Popen</code>, <code>call</code>, <code>check_call</code>,
+<code>getoutput</code> and <code>getstatusoutput</code>.</p>
+<p>If you want to run a bunch of commands under the same environment, you
+can use the following:</p>
+<pre><code class="language-python">import nix_shell
+
+# build a shell manually
+nix = nix_shell.mk_shell(packages=[&quot;curl&quot;], library_path=[&quot;stdenv.cc.cc.lib&quot;])
+
+# specify a shell.nix file to use
+nix = nix_shell.from_nix(&quot;path:/to/my/shell.nix&quot;)
+
+# specify a flake to use
+nix = nix_shell.from_flake(&quot;path:/to/my/flake.nix#devShells.default&quot;)
+
+nix.run([&quot;curl&quot;, &quot;https://google.com&quot;])
+</code></pre>
+<h2 id="details">Details</h2>
+<h3 id="versioning">Versioning</h3>
+<p><code>nix-shell</code> tries to keep evaluation pure in order to leverage caching
+capabilities when running Nix commands. As such, when running commands
+via <code>from_nix</code> for <code>mk_shell</code>, the <code>nixpkgs</code> version is determined
+using the <code>flake.lock</code> from this project. It is updated weekly.</p>
               
             </div>
           </div><footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
-        <a href="getting-started/" class="btn btn-neutral float-left" title="Getting Started"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="getting-started/" class="btn btn-neutral float-right" title="Getting Started">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
 
   <hr/>
@@ -135,13 +166,9 @@
   <div class="rst-versions" role="note" aria-label="Versions">
   <span class="rst-current-version" data-toggle="rst-current-version">
     
-        <span>
-          <a href="https://github.com/chadac/py-nix-shell" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
-        </span>
     
     
-      <span><a href="getting-started/" style="color: #fcfcfc">&laquo; Previous</a></span>
-    
+      <span><a href="getting-started/" style="color: #fcfcfc">Next &raquo;</a></span>
     
   </span>
 </div>
