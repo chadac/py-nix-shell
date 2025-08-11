@@ -27,29 +27,45 @@ import nix_shell
 
 # nix_shell supports existing subprocess commands
 
-# if the command name matches the nixpkgs name, use that
-# see https://search.nixos.org/packages for a list of packages
-nix_shell.run(["curl", "https://google.com"])
+# if the command name matches the `nixpkgs` name, install that by default
+nix_shell.run(["curl", "https://google.com", "--insecure"])
 
-# you can also specify the nix packages to install
-nix_shell.run(["curl", "https://google.com"], packages=["curlMinimal"])
+# you can manually specify nix packages to install
+nix_shell.run(["curl", "https://google.com"], packages=["curl", "openssl"])
 
-# you can also use a dev environment from a flake
+# use a dev environment from a flake
 nix_shell.run(["curl", "https://google.com"], flake="github:chadac/py-nix-shell#sample-curl-env")
 
-# this supports
+# or, just use the `nixpkgs` version from a `flake.lock` file
+nix_shell.run(["curl", "https://google.com"], packages=["curl", "openssl"], flake_lock=Path("./my/flake.lock"))
 ```
 
-It is also possible to specify a common environment to run commands under:
+You can use `run`, `check_output`, `Popen`, `call`, `check_call`,
+`getoutput` and `getstatusoutput`.
+
+If you want to run a bunch of commands under the same environment, you
+can use the following:
 
 ```python
 import nix_shell
 
-nix = nix_shell.from_flake("/path/to/my/flake.nix")
+# build a shell manually
+nix = nix_shell.mk_shell(packages=["curl"], library_path=["stdenv.cc.cc.lib"])
+
+# specify a shell.nix file to use
+nix = nix_shell.from_nix("path:/to/my/shell.nix")
+
+# specify a flake to use
+nix = nix_shell.from_flake("path:/to/my/flake.nix#devShells.default")
 
 nix.run(["curl", "https://google.com"])
 ```
 
-```python
-nix_shell.mk_shell(packages=["git"])
-```
+## Details
+
+### Versioning
+
+`nix-shell` tries to keep evaluation pure in order to leverage caching
+capabilities when running Nix commands. As such, when running commands
+via `from_nix` for `mk_shell`, the `nixpkgs` version is determined
+using the `flake.lock` from this project. It is updated weekly.

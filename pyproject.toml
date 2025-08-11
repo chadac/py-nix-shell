@@ -13,6 +13,7 @@ dependencies = []
 [dependency-groups]
 dev = [
     "mypy>=1.17.0",
+    "pydoc-markdown>=4.8.2",
     "pytest>=8.4.1",
     "ruff>=0.12.5",
 ]
@@ -22,3 +23,21 @@ dev = [
 
 [tool.mypy]
 modules = ["nix_shell", "tests"]
+
+[[tool.pydoc-markdown.loaders]]
+type = "python"
+search_path = [ "." ]
+
+[tool.pydoc-markdown.renderer]
+type = "mkdocs"
+output_directory = "./docs"
+site_name = "py-nix-shell"
+
+[tool.pydoc-markdown.renderer.mkdocs_config]
+repo_url = "https://github.com/chadac/py-nix-shell"
+repo_name = "GitHub"
+
+[[tool.pydoc-markdown.renderer.pages]]
+title = "API Documentation"
+name = "index"
+contents = [ "nix_shell.*" ]

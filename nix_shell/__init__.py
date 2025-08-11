@@ -6,7 +6,7 @@ from nix_shell.builders import (
     MkNixParams,
     MkShellParams,
     from_flake,
-    mk_nix,
+    from_nix,
     mk_shell,
 )
 from nix_shell.nix_subprocess import NixSubprocess
@@ -20,7 +20,7 @@ def _infer_shell(*args, **kwargs) -> tuple[NixSubprocess, Any, Any]:
         shell_cmd = from_flake
     elif "nix_file" in kwargs:
         shell_kwargs_keys = set(MkNixParams.__annotations__.keys())
-        shell_cmd = mk_nix
+        shell_cmd = from_nix
     else:
         if "packages" not in kwargs:
             if isinstance(args[0], list):
@@ -54,9 +54,31 @@ def Popen(*args, **kwargs) -> subprocess.Popen[str] | subprocess.Popen[bytes]:
     return nix.Popen(*new_args, **new_kwargs)
 
 
+def call(*args, **kwargs) -> int:
+    nix, new_args, new_kwargs = _infer_shell(*args, **kwargs)
+    return nix.call(*new_args, **new_kwargs)
+
+
+def check_call(*args, **kwargs) -> int:
+    nix, new_args, new_kwargs = _infer_shell(*args, **kwargs)
+    return nix.check_call(*new_args, **new_kwargs)
+
+
+def getoutput(*args, **kwargs) -> str:
+    nix, new_args, new_kwargs = _infer_shell(*args, **kwargs)
+    return nix.getoutput(*new_args, **new_kwargs)
+
+
+def getstatusoutput(*args, **kwargs) -> tuple[int, str]:
+    nix, new_args, new_kwargs = _infer_shell(*args, **kwargs)
+    return nix.getstatusoutput(*new_args, **new_kwargs)
+
+
 __all__ = [
     "run",
     "check_output",
     "Popen",
     "mk_shell",
+    "from_nix",
+    "from_flake",
 ]
