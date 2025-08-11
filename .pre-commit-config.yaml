@@ -19,3 +19,9 @@ repos:
       language: system
       files: '(nix_shell|tests)/.*'
       stages: [pre-commit]
+    - id: check-docs
+      name: ensure docs are up-to-date
+      entry: 'just docs-build'
+      language: system
+      pass_filenames: false
+      stages: [pre-commit]

@@ -1,0 +1,69 @@
+docs_dir: docs
+nav:
+- Home: index.md
+- Builders: builders.md
+- Usage:
+  - shell.py: usage/shell.py.md
+  - subprocess: usage/subprocess.md
+  - activate: usage/activate.md
+- Advanced: advanced.md
+- API:
+    - nix_shell:
+      - api/index.md
+      - builders: api/builders.md
+      - build: api/build.md
+      - constants: api/constants.md
+      - exceptions: api/exceptions.md
+      - flake: api/flake.md
+      - nixlang: api/nixlang.md
+      - _nix: api/_nix.md
+site_name: py-nix-shell
+theme:
+  name: material
+  palette:
+    # Palette toggle for automatic mode
+    - media: "(prefers-color-scheme)"
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: blue
+      accent: blue
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: blue
+      accent: blue
+      toggle:
+        icon: material/brightness-4
+        name: Switch to system preference
+
+markdown_extensions:
+  - abbr
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.details
+
+plugins:
+  - search
+  - mkdocstrings:
+      enabled: true
+      default_handler: python
+      handlers:
+        python:
+          options:
+            docstring_style: google
+            show_source: false
+            # show_if_no_docstring: true
+            show_signature_annotations: true
+            signature_crossrefs: true
+            separate_signature: true
+            unwrap_annotated: true

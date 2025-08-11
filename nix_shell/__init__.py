@@ -1,6 +1,7 @@
 import subprocess
 from typing import Any, Callable
 
+from nix_shell.build import NixShell
 from nix_shell.builders import (
     FlakeRefParams,
     MkNixParams,
@@ -9,11 +10,10 @@ from nix_shell.builders import (
     from_nix,
     mk_shell,
 )
-from nix_shell.nix_subprocess import NixSubprocess
 
 
-def _infer_shell(*args, **kwargs) -> tuple[NixSubprocess, Any, Any]:
-    shell_cmd: Callable[..., NixSubprocess]
+def _infer_shell(*args, **kwargs) -> tuple[NixShell, Any, Any]:
+    shell_cmd: Callable[..., NixShell]
     shell_kwargs_keys: set[str]
     if "flake" in kwargs:
         shell_kwargs_keys = set(FlakeRefParams.__annotations__.keys())

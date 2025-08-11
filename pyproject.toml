@@ -10,11 +10,16 @@ readme = "README.md"
 requires-python = ">=3.10"
 dependencies = []
 
+[project.scripts]
+py-nix-shell = "nix_shell.cli:main"
+
 [dependency-groups]
 dev = [
+    "mkdocs-material>=9.6.16",
+    "mkdocstrings[python]>=0.30.0",
     "mypy>=1.17.0",
-    "pydoc-markdown>=4.8.2",
     "pytest>=8.4.1",
+    "pytest-isolate>=0.0.13",
     "ruff>=0.12.5",
 ]
 
@@ -33,11 +38,19 @@ type = "mkdocs"
 output_directory = "./docs"
 site_name = "py-nix-shell"
 
+[[tool.pydoc-markdown.renderer.pages]]
+title = "Home"
+name = "index"
+source = "README.md"
+
+[[tool.pydoc-markdown.renderer.pages]]
+title = "Usage"
+name = "usage"
+
 [tool.pydoc-markdown.renderer.mkdocs_config]
-repo_url = "https://github.com/chadac/py-nix-shell"
-repo_name = "GitHub"
+theme = "readthedocs"
 
 [[tool.pydoc-markdown.renderer.pages]]
 title = "API Documentation"
-name = "index"
+name = "api"
 contents = [ "nix_shell.*" ]
