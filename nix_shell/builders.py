@@ -12,6 +12,8 @@ from nix_shell.nix_subprocess import NixSubprocess
 
 
 class FlakeRefParams(TypedDict):
+    """Parameters to provide for building Flake shells."""
+
     flake: str
 
 
@@ -39,10 +41,15 @@ def _pkgs_list(pkgs: list[str]) -> nixlang.NixValue:
 
 
 def from_flake(**kwargs: Unpack[FlakeRefParams]) -> NixSubprocess:
+    """
+    Create a Nix shell from a flake.
+
+    :param flake: Flake reference to use for shell.
+    """
     return NixSubprocess.build(ref=kwargs["flake"])
 
 
-def mk_nix(**kwargs: Unpack[MkNixParams]) -> NixSubprocess:
+def from_nix(**kwargs: Unpack[MkNixParams]) -> NixSubprocess:
     include: dict[str, str] = {}
     if "nixpkgs" in kwargs:
         include["nixpkgs"] = _nix.flake.metadata(kwargs["nixpkgs"])["locked"]["path"]

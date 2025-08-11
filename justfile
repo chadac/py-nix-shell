@@ -14,3 +14,12 @@ mypy *args:
 
 test *args:
   uv run -- pytest {{args}}
+
+docs: docs-build docs-deploy
+
+docs-build:
+  uv run -- pydoc-markdown
+
+[working-directory: 'docs']
+docs-deploy:
+  mkdocs gh-deploy

@@ -1,3 +1,5 @@
+"""Interface for invoking the Nix CLI from Python."""
+
 import json
 import subprocess
 from functools import cache
