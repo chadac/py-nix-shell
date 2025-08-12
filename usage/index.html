@@ -9,23 +9,25 @@
       
       
       
+        <link rel="prev" href="..">
       
-        <link rel="next" href="usage/">
+      
+        <link rel="next" href="../api/root/">
       
       
-      <link rel="icon" href="assets/images/favicon.png">
+      <link rel="icon" href="../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.16">
     
     
       
-        <title>py-nix-shell</title>
+        <title>Usage - py-nix-shell</title>
       
     
     
-      <link rel="stylesheet" href="assets/stylesheets/main.7e37652d.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.7e37652d.min.css">
       
         
-        <link rel="stylesheet" href="assets/stylesheets/palette.06af60db.min.css">
+        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
       
       
 
@@ -44,9 +46,9 @@
       
     
     
-      <link rel="stylesheet" href="assets/_mkdocstrings.css">
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
     
-    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -72,7 +74,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#py-nix-shell" class="md-skip">
+        <a href="#general-usage" class="md-skip">
           Skip to content
         </a>
       
@@ -88,7 +90,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="." title="py-nix-shell" class="md-header__button md-logo" aria-label="py-nix-shell" data-md-component="logo">
+    <a href=".." title="py-nix-shell" class="md-header__button md-logo" aria-label="py-nix-shell" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -108,7 +110,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Home
+              Usage
             
           </span>
         </div>
@@ -222,7 +224,7 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="." title="py-nix-shell" class="md-nav__button md-logo" aria-label="py-nix-shell" data-md-component="logo">
+    <a href=".." title="py-nix-shell" class="md-nav__button md-logo" aria-label="py-nix-shell" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -232,6 +234,28 @@
   </label>
   
   <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Home
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
     
       
       
@@ -254,7 +278,7 @@
   
   
   <span class="md-ellipsis">
-    Home
+    Usage
     
   </span>
   
@@ -262,12 +286,12 @@
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <a href="." class="md-nav__link md-nav__link--active">
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
   <span class="md-ellipsis">
-    Home
+    Usage
     
   </span>
   
@@ -290,27 +314,27 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#features" class="md-nav__link">
+  <a href="#from_nix" class="md-nav__link">
     <span class="md-ellipsis">
-      Features
+      from_nix
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#installation" class="md-nav__link">
+  <a href="#from_flake" class="md-nav__link">
     <span class="md-ellipsis">
-      Installation
+      from_flake
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#getting-started" class="md-nav__link">
+  <a href="#mk_shell" class="md-nav__link">
     <span class="md-ellipsis">
-      Getting Started
+      mk_shell
     </span>
   </a>
   
@@ -320,28 +344,6 @@
   
 </nav>
       
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="usage/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    Usage
-    
-  </span>
-  
-
-      </a>
     </li>
   
 
@@ -429,7 +431,7 @@
   
   
     <li class="md-nav__item">
-      <a href="api/root/" class="md-nav__link">
+      <a href="../api/root/" class="md-nav__link">
         
   
   
@@ -452,7 +454,7 @@
   
   
     <li class="md-nav__item">
-      <a href="api/builders/" class="md-nav__link">
+      <a href="../api/builders/" class="md-nav__link">
         
   
   
@@ -475,7 +477,7 @@
   
   
     <li class="md-nav__item">
-      <a href="api/constants/" class="md-nav__link">
+      <a href="../api/constants/" class="md-nav__link">
         
   
   
@@ -498,7 +500,7 @@
   
   
     <li class="md-nav__item">
-      <a href="api/exceptions/" class="md-nav__link">
+      <a href="../api/exceptions/" class="md-nav__link">
         
   
   
@@ -521,7 +523,7 @@
   
   
     <li class="md-nav__item">
-      <a href="api/flake/" class="md-nav__link">
+      <a href="../api/flake/" class="md-nav__link">
         
   
   
@@ -544,7 +546,7 @@
   
   
     <li class="md-nav__item">
-      <a href="api/nixlang/" class="md-nav__link">
+      <a href="../api/nixlang/" class="md-nav__link">
         
   
   
@@ -567,7 +569,7 @@
   
   
     <li class="md-nav__item">
-      <a href="api/nix_subprocess/" class="md-nav__link">
+      <a href="../api/nix_subprocess/" class="md-nav__link">
         
   
   
@@ -590,7 +592,7 @@
   
   
     <li class="md-nav__item">
-      <a href="api/_nix/" class="md-nav__link">
+      <a href="../api/_nix/" class="md-nav__link">
         
   
   
@@ -648,27 +650,27 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#features" class="md-nav__link">
+  <a href="#from_nix" class="md-nav__link">
     <span class="md-ellipsis">
-      Features
+      from_nix
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#installation" class="md-nav__link">
+  <a href="#from_flake" class="md-nav__link">
     <span class="md-ellipsis">
-      Installation
+      from_flake
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#getting-started" class="md-nav__link">
+  <a href="#mk_shell" class="md-nav__link">
     <span class="md-ellipsis">
-      Getting Started
+      mk_shell
     </span>
   </a>
   
@@ -690,59 +692,93 @@
 
 
 
-<h1 id="py-nix-shell">py-nix-shell</h1>
-<p><a href="https://github.com/chadac/py-nix-shell/actions/workflows/pr.yaml"><img alt="ci" src="https://github.com/chadac/py-nix-shell/actions/workflows/pr.yaml/badge.svg" /></a>
-<a href="https://pypi.org/project/nix-shell/"><img alt="pypi" src="https://img.shields.io/pypi/v/nix-shell.svg" /></a></p>
-<p>Invoke commands inside Nix shells from Python using the familiar
-<code>subprocess</code> interface.</p>
-<h2 id="features">Features</h2>
-<ul>
-<li><a href="https://chadac.github.io/py-nix-shell/usage/"><strong>Easy to use</strong></a>: Commands that use <code>subprocess.run</code> can be easily
-  migrated -- simply swap <code>subprocess.run</code> with <code>nix_shell.run</code> and
-  you're good to go.</li>
-<li><strong>Supports non-Nix users</strong>: Folks without Nix can still use this,
-  and get helpful error messages describing what they need to install
-  or instructions for installing Nix.</li>
-<li><strong>Customizable</strong>: You can manage your Shell environments with <a href="https://nix.dev/concepts/flakes.html#flakes">flakes</a>, a <a href="https://nix.dev/tutorials/first-steps/declarative-shell.html">shell.nix</a>, or even <a href="https://chadac.github.io/py-nix-shell/usage#mk_shell">through Python</a></li>
-</ul>
-<h2 id="installation">Installation</h2>
-<pre><code class="language-bash">pip install nix-shell
+<h1 id="general-usage">General usage</h1>
+<p><code>py-nix-shell</code> provisions Nix shells in one of three ways: via a
+<code>shell.nix</code>, a Nix flake, or programatically via Python.</p>
+<p>The most basic invocation is via <code>nix_shell.run</code>:</p>
+<pre><code class="language-python">nix_shell.run([&quot;uv&quot;, &quot;run&quot;, &quot;--&quot;, &quot;pytest&quot;])
 </code></pre>
-<h2 id="getting-started">Getting Started</h2>
-<p>See the <a href="https://chadac.github.io/py-nix-shell/#">docs</a> for more details, but</p>
-<pre><code class="language-python">import nix_shell
-
-# nix_shell supports existing subprocess commands
-
-# if the command name matches the `nixpkgs` name, install that by default
-nix_shell.run([&quot;curl&quot;, &quot;https://google.com&quot;, &quot;--insecure&quot;])
-
-# you can manually specify nix packages to install
-nix_shell.run([&quot;curl&quot;, &quot;https://google.com&quot;], packages=[&quot;curl&quot;, &quot;openssl&quot;])
-
-# use a dev environment from a flake
-nix_shell.run([&quot;curl&quot;, &quot;https://google.com&quot;], flake=&quot;github:chadac/py-nix-shell#sample-curl-env&quot;)
-
-# or, just use the `nixpkgs` version from a `flake.lock` file
-nix_shell.run([&quot;curl&quot;, &quot;https://google.com&quot;], packages=[&quot;curl&quot;, &quot;openssl&quot;], flake_lock=Path(&quot;./my/flake.lock&quot;))
+<p>This automatically installs <code>uv</code> from <code>nixpkgs</code> and uses that to
+invoke <code>pytest</code>.</p>
+<p>You may also manually specify packages to include:</p>
+<pre><code class="language-python">nix_shell.check_output([&quot;make&quot;, &quot;test&quot;], packages=[&quot;uv&quot;, &quot;gnumake&quot;, &quot;python312&quot;])
 </code></pre>
-<p>You can use <code>run</code>, <code>check_output</code>, <code>Popen</code>, <code>call</code>, <code>check_call</code>,
-<code>getoutput</code> and <code>getstatusoutput</code>.</p>
-<p>If you want to run a bunch of commands under the same environment, you
-can use the following:</p>
-<pre><code class="language-python">import nix_shell
+<p>If you already have a <code>shell.nix</code> or <code>flake.nix</code>, it's possible to
+activate these environments as well:</p>
+<pre><code class="language-python">nix_shell.call([&quot;curl&quot;, &quot;http://localhost:8080&quot;], nix_file=Path(&quot;/to/your/shell.nix&quot;))
 
-# build a shell manually
-nix = nix_shell.mk_shell(packages=[&quot;curl&quot;], library_path=[&quot;stdenv.cc.cc.lib&quot;])
+nix_shell.Popen([&quot;curl&quot;, &quot;http://localhost:8080&quot;], flake=Path(&quot;/to/your/flake/project&quot;))
+nix_shell.Popen([&quot;curl&quot;, &quot;http://localhost:8080&quot;], flake=&quot;github:your/flake-project&quot;)
+</code></pre>
+<p>If you need to invoke multiple commands in sequence, you can also
+generate a reusable shell in three ways:</p>
+<h2 id="from_nix">from_nix</h2>
+<p>Provisions a Nix shell from a <code>shell.nix</code> file.</p>
+<pre><code>from nix_shell import from_nix
 
-# specify a shell.nix file to use
-nix = nix_shell.from_nix(&quot;path:/to/my/shell.nix&quot;)
+nix = from_nix(nix_file=&quot;/path/to/your/shell.nix&quot;)
 
-# specify a flake to use
-nix = nix_shell.from_flake(&quot;path:/to/my/flake.nix#devShells.default&quot;)
-
+# This runs inside the given Nix shell
 nix.run([&quot;curl&quot;, &quot;https://google.com&quot;])
 </code></pre>
+<h2 id="from_flake">from_flake</h2>
+<p>Provisions a Nix shell from a Flake output.</p>
+<pre><code>from nix_shell import from_flake
+
+# if you don't specify the particular output we will assume it is devShells.default
+nix = from_flake(flake=&quot;path:/to/your/flake.nix&quot;)
+
+# but you can specify alternatives
+nix = from_flake(flake=&quot;path:/to/your/flake.nix#devShells.alternate&quot;)
+</code></pre>
+<h2 id="mk_shell">mk_shell</h2>
+<p>Provisions a Nix shell programatically via Python. For example,
+something like</p>
+<pre><code class="language-python">nix = nix_shell.mk_shell(
+    packages=[&quot;curl&quot;, &quot;openssl&quot;],
+    library_path=[&quot;stdenv.cc.cc.lib&quot;],
+    shell_hook=&quot;echo 'Hello world!'&quot;,
+)
+</code></pre>
+<p>would be equivalent to the following <code>shell.nix</code>:</p>
+<pre><code class="language-nix">{ pkgs ? import &lt;nixpkgs&gt; {} }:
+pkgs.mkShell {
+  packages = with pkgs; [ curl openssl ];
+  shellHook = ''
+    export LD_LIBRARY_PATH=${pkgs.lib.makeLibraryPath [ pkgs.stdenv.cc.cc.lib ]}:$LD_LIBRARY_PATH
+    echo 'Hello world!'
+  '';
+}
+</code></pre>
+<p>This enables you to quickly and dynamically provision shells whenever
+needed.</p>
+<h1 id="advanced-usage">Advanced Usage</h1>
+<h2 id="pure-evaluation">Pure evaluation</h2>
+<p>By default, all Nix shell evaluations in <code>py-nix-shell</code> are pure. This
+means that generally your <code>shell.nix</code> files can't access user
+envirnonment variables, and you can't access other files on the
+filesystem from Nix.</p>
+<p>In order to disable this behavior, you can pass <code>impure=True</code>:</p>
+<pre><code class="language-python">nix = nix_shell.from_nix(&quot;/path/to/your/shell.nix&quot;, impure=True)
+</code></pre>
+<h2 id="nixpkgs-version-locking"><code>nixpkgs</code> version locking</h2>
+<p>This is specific only to <code>mk_shell</code> and <code>from_nix</code>. <code>from_flake</code> only
+uses the <code>nixpkgs</code> version as specified in the `flake.lock file.</p>
+<p>In order to support pure evaluation, <code>py-nix-shell</code> direclty manages
+the version of <code>nixpkgs</code> you use. You can control this behavior by
+passing the following:</p>
+<ul>
+<li><strong>default behavior</strong>: Uses the version specified in this project's <a href="https://github.com/chadac/py-nix-shell/blob/main/flake.lock">flake.lock</a>. The package is updated weekly so that you can automatically keep your <code>nixpkgs</code> version up-to-date if needed.</li>
+<li><code>use_global_nixpkgs=True</code>: If you'd prefer to use the version of
+  <code>nixpkgs</code> the user has locally, you can specify <code>use_global_nixpkgs</code>
+  command. This extracts the <code>nixpkgs</code> version from <code>nix flake
+  metadata nixpkgs</code>.</li>
+<li><code>flake_lock=Path("./to/your/flake.lock")</code>: You may also use a
+  <code>flake.lock</code> file. This will check for a <code>nixpkgs</code> entry and use
+  that version. If your <code>flake.lock</code> keeps its <code>nixpkgs</code> version under
+  a different name, you can use
+  <code>flake_lock_name="alternative_nixpkgs"</code> to specify.</li>
+</ul>
 
 
 
@@ -791,10 +827,10 @@ nix.run([&quot;curl&quot;, &quot;https://google.com&quot;])
     
     
       
-      <script id="__config" type="application/json">{"base": ".", "features": [], "search": "assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="assets/javascripts/bundle.50899def.min.js"></script>
+      <script src="../assets/javascripts/bundle.50899def.min.js"></script>
       
     
   </body>
