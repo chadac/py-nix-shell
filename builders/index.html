@@ -830,8 +830,8 @@
 
 <h1 id="builders">Builders</h1>
 <p>While <code>nix_shell</code> can act as a very minimal layer on top of a generic
-<code>shell.nix</code>, it has the ability to build generic shells using a
-variety of methods to best meet your needs.</p>
+<code>shell.nix</code>, we offer a variety of <em>builders</em> that generate Nix
+derivations for you.</p>
 <h2 id="mk_shell">mk_shell</h2>
 <p>Provisions a Nix shell programatically via Python. For example,
 something like</p>
@@ -851,26 +851,27 @@ pkgs.mkShell {
   '';
 }
 </code></pre>
-<p>This enables you to quickly and dynamically provision shells whenever
-needed.</p>
+<p>This enables you to avoid using Nix language in your development setup
+-- useful if you're vending Nix as a utility for Python developers,
+for example.</p>
 <h2 id="from_nix">from_nix</h2>
 <p>Provisions a Nix shell from a <code>shell.nix</code> file.</p>
 <pre><code>from nix_shell import from_nix
 
-nix = from_nix(nix_file=&quot;/path/to/your/shell.nix&quot;)
+shell = from_nix(nix_file=&quot;/path/to/your/shell.nix&quot;)
 
 # This runs inside the given Nix shell
-nix.run([&quot;curl&quot;, &quot;https://google.com&quot;])
+shell.run([&quot;curl&quot;, &quot;https://google.com&quot;])
 </code></pre>
 <h2 id="from_flake">from_flake</h2>
 <p>Provisions a Nix shell from a Flake output.</p>
 <pre><code>from nix_shell import from_flake
 
 # if you don't specify the particular output we will assume it is devShells.default
-nix = from_flake(flake=&quot;path:/to/your/flake.nix&quot;)
+shell = from_flake(flake=&quot;path:/to/your/flake.nix&quot;)
 
 # but you can specify alternatives
-nix = from_flake(flake=&quot;path:/to/your/flake.nix#devShells.alternate&quot;)
+shell = from_flake(flake=&quot;path:/to/your/flake.nix#devShells.alternate&quot;)
 </code></pre>
 
 
