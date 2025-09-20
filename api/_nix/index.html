@@ -9,7 +9,7 @@
       
       
       
-        <link rel="prev" href="../nix_subprocess/">
+        <link rel="prev" href="../nixlang/">
       
       
       
@@ -262,7 +262,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../usage/" class="md-nav__link">
+      <a href="../../usage.md" class="md-nav__link">
         
   
   
@@ -502,7 +502,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../nix_subprocess/" class="md-nav__link">
+      <a href="../nix_subprocess.md" class="md-nav__link">
         
   
   
@@ -1165,7 +1165,10 @@ interpretation of installables".</p>
 
 </h2>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">build</span><span class="p">(</span>
-    <span class="n">no_link</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">:</span> <span class="n"><span title="typing.Unpack">Unpack</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="NixBuildArgs (nix_shell._nix.NixBuildArgs)" href="#nix_shell._nix.NixBuildArgs">NixBuildArgs</a></span><span class="p">]</span>
+    <span class="n">out_link</span><span class="p">:</span> <span class="n"><span title="pathlib.Path">Path</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">no_link</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">print_out_paths</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">params</span><span class="p">:</span> <span class="n"><span title="typing.Unpack">Unpack</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="NixBuildArgs (nix_shell._nix.NixBuildArgs)" href="#nix_shell._nix.NixBuildArgs">NixBuildArgs</a></span><span class="p">],</span>
 <span class="p">)</span>
 </code></pre></div>
 

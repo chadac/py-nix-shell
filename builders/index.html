@@ -9,10 +9,6 @@
       
       
       
-        <link rel="prev" href="..">
-      
-      
-        <link rel="next" href="../api/root/">
       
       
       <link rel="icon" href="../assets/images/favicon.png">
@@ -20,7 +16,7 @@
     
     
       
-        <title>Usage - py-nix-shell</title>
+        <title>Builders - py-nix-shell</title>
       
     
     
@@ -74,7 +70,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#general-usage" class="md-skip">
+        <a href="#builders" class="md-skip">
           Skip to content
         </a>
       
@@ -110,7 +106,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Usage
+              Builders
             
           </span>
         </div>
@@ -261,32 +257,10 @@
       
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    Usage
-    
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../usage.md" class="md-nav__link">
         
   
   
@@ -297,53 +271,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#from_nix" class="md-nav__link">
-    <span class="md-ellipsis">
-      from_nix
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#from_flake" class="md-nav__link">
-    <span class="md-ellipsis">
-      from_flake
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#mk_shell" class="md-nav__link">
-    <span class="md-ellipsis">
-      mk_shell
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -569,7 +496,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../api/nix_subprocess/" class="md-nav__link">
+      <a href="../api/nix_subprocess.md" class="md-nav__link">
         
   
   
@@ -650,6 +577,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#mk_shell" class="md-nav__link">
+    <span class="md-ellipsis">
+      mk_shell
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#from_nix" class="md-nav__link">
     <span class="md-ellipsis">
       from_nix
@@ -662,15 +598,6 @@
   <a href="#from_flake" class="md-nav__link">
     <span class="md-ellipsis">
       from_flake
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#mk_shell" class="md-nav__link">
-    <span class="md-ellipsis">
-      mk_shell
     </span>
   </a>
   
@@ -692,45 +619,10 @@
 
 
 
-<h1 id="general-usage">General usage</h1>
-<p><code>py-nix-shell</code> provisions Nix shells in one of three ways: via a
-<code>shell.nix</code>, a Nix flake, or programatically via Python.</p>
-<p>The most basic invocation is via <code>nix_shell.run</code>:</p>
-<pre><code class="language-python">nix_shell.run([&quot;uv&quot;, &quot;run&quot;, &quot;--&quot;, &quot;pytest&quot;])
-</code></pre>
-<p>This automatically installs <code>uv</code> from <code>nixpkgs</code> and uses that to
-invoke <code>pytest</code>.</p>
-<p>You may also manually specify packages to include:</p>
-<pre><code class="language-python">nix_shell.check_output([&quot;make&quot;, &quot;test&quot;], packages=[&quot;uv&quot;, &quot;gnumake&quot;, &quot;python312&quot;])
-</code></pre>
-<p>If you already have a <code>shell.nix</code> or <code>flake.nix</code>, it's possible to
-activate these environments as well:</p>
-<pre><code class="language-python">nix_shell.call([&quot;curl&quot;, &quot;http://localhost:8080&quot;], nix_file=Path(&quot;/to/your/shell.nix&quot;))
-
-nix_shell.Popen([&quot;curl&quot;, &quot;http://localhost:8080&quot;], flake=Path(&quot;/to/your/flake/project&quot;))
-nix_shell.Popen([&quot;curl&quot;, &quot;http://localhost:8080&quot;], flake=&quot;github:your/flake-project&quot;)
-</code></pre>
-<p>If you need to invoke multiple commands in sequence, you can also
-generate a reusable shell in three ways:</p>
-<h2 id="from_nix">from_nix</h2>
-<p>Provisions a Nix shell from a <code>shell.nix</code> file.</p>
-<pre><code>from nix_shell import from_nix
-
-nix = from_nix(nix_file=&quot;/path/to/your/shell.nix&quot;)
-
-# This runs inside the given Nix shell
-nix.run([&quot;curl&quot;, &quot;https://google.com&quot;])
-</code></pre>
-<h2 id="from_flake">from_flake</h2>
-<p>Provisions a Nix shell from a Flake output.</p>
-<pre><code>from nix_shell import from_flake
-
-# if you don't specify the particular output we will assume it is devShells.default
-nix = from_flake(flake=&quot;path:/to/your/flake.nix&quot;)
-
-# but you can specify alternatives
-nix = from_flake(flake=&quot;path:/to/your/flake.nix#devShells.alternate&quot;)
-</code></pre>
+<h1 id="builders">Builders</h1>
+<p>While <code>nix_shell</code> can act as a very minimal layer on top of a generic
+<code>shell.nix</code>, it has the ability to build generic shells using a
+variety of methods to best meet your needs.</p>
 <h2 id="mk_shell">mk_shell</h2>
 <p>Provisions a Nix shell programatically via Python. For example,
 something like</p>
@@ -752,6 +644,25 @@ pkgs.mkShell {
 </code></pre>
 <p>This enables you to quickly and dynamically provision shells whenever
 needed.</p>
+<h2 id="from_nix">from_nix</h2>
+<p>Provisions a Nix shell from a <code>shell.nix</code> file.</p>
+<pre><code>from nix_shell import from_nix
+
+nix = from_nix(nix_file=&quot;/path/to/your/shell.nix&quot;)
+
+# This runs inside the given Nix shell
+nix.run([&quot;curl&quot;, &quot;https://google.com&quot;])
+</code></pre>
+<h2 id="from_flake">from_flake</h2>
+<p>Provisions a Nix shell from a Flake output.</p>
+<pre><code>from nix_shell import from_flake
+
+# if you don't specify the particular output we will assume it is devShells.default
+nix = from_flake(flake=&quot;path:/to/your/flake.nix&quot;)
+
+# but you can specify alternatives
+nix = from_flake(flake=&quot;path:/to/your/flake.nix#devShells.alternate&quot;)
+</code></pre>
 <h1 id="advanced-usage">Advanced Usage</h1>
 <h2 id="pure-evaluation">Pure evaluation</h2>
 <p>By default, all Nix shell evaluations in <code>py-nix-shell</code> are pure. This

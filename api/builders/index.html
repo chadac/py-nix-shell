@@ -264,7 +264,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../usage/" class="md-nav__link">
+      <a href="../../usage.md" class="md-nav__link">
         
   
   
@@ -632,7 +632,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../nix_subprocess/" class="md-nav__link">
+      <a href="../nix_subprocess.md" class="md-nav__link">
         
   
   
@@ -1104,6 +1104,22 @@
                 <em>required</em>
             </td>
           </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>system</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The system to build for. The default is the current system that <code>py-nix-shell</code> is running on.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
       </tbody>
     </table>
 
@@ -1267,14 +1283,12 @@
 
 
 </h2>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">from_flake</span><span class="p">(</span>
-    <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n"><span title="typing.Unpack">Unpack</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="FlakeRefParams (nix_shell.builders.FlakeRefParams)" href="#nix_shell.builders.FlakeRefParams">FlakeRefParams</a></span><span class="p">],</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-internal" title="NixSubprocess
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">from_flake</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n"><span title="typing.Unpack">Unpack</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="FlakeRefParams (nix_shell.builders.FlakeRefParams)" href="#nix_shell.builders.FlakeRefParams">FlakeRefParams</a></span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-internal" title="NixShell
 
 
   
       dataclass
-   (nix_shell.nix_subprocess.NixSubprocess)" href="../nix_subprocess/#nix_shell.nix_subprocess.NixSubprocess">NixSubprocess</a></span>
+   (nix_shell.build.NixShell)" href="../build/#nix_shell.build.NixShell">NixShell</a></span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -1294,12 +1308,12 @@
 
 
 </h2>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">from_nix</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n"><span title="typing.Unpack">Unpack</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="MkNixParams (nix_shell.builders.MkNixParams)" href="#nix_shell.builders.MkNixParams">MkNixParams</a></span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-internal" title="NixSubprocess
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">from_nix</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n"><span title="typing.Unpack">Unpack</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="MkNixParams (nix_shell.builders.MkNixParams)" href="#nix_shell.builders.MkNixParams">MkNixParams</a></span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-internal" title="NixShell
 
 
   
       dataclass
-   (nix_shell.nix_subprocess.NixSubprocess)" href="../nix_subprocess/#nix_shell.nix_subprocess.NixSubprocess">NixSubprocess</a></span>
+   (nix_shell.build.NixShell)" href="../build/#nix_shell.build.NixShell">NixShell</a></span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -1319,12 +1333,12 @@
 
 
 </h2>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">mk_shell</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n"><span title="typing.Unpack">Unpack</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="MkShellParams (nix_shell.builders.MkShellParams)" href="#nix_shell.builders.MkShellParams">MkShellParams</a></span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-internal" title="NixSubprocess
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">mk_shell</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n"><span title="typing.Unpack">Unpack</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="MkShellParams (nix_shell.builders.MkShellParams)" href="#nix_shell.builders.MkShellParams">MkShellParams</a></span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-internal" title="NixShell
 
 
   
       dataclass
-   (nix_shell.nix_subprocess.NixSubprocess)" href="../nix_subprocess/#nix_shell.nix_subprocess.NixSubprocess">NixSubprocess</a></span>
+   (nix_shell.build.NixShell)" href="../build/#nix_shell.build.NixShell">NixShell</a></span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
