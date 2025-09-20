@@ -18,8 +18,10 @@ test *args:
 docs: docs-build docs-deploy
 
 docs-build:
-  uv run -- pydoc-markdown
+  mkdocs build
 
-[working-directory: 'docs']
+docs-serve:
+  mkdocs serve -w nix_shell -w docs
+
 docs-deploy:
   mkdocs gh-deploy

@@ -2,32 +2,47 @@
 
 from __future__ import annotations
 
+import abc
 from dataclasses import dataclass
 
 
-@dataclass(frozen=True)
-class Let:
+class NixType(abc.ABC):
+    def dumps(self) -> str:
+        raise NotImplementedError()
+
+
+@dataclass
+class Let(NixType):
     exprs: dict[str, NixValue]
     result: NixValue
+
+    def dumps(self) -> str:
+        return _let(self)
 
 
 def let(in_: NixValue, **exprs: NixValue) -> Let:
     return Let(exprs, in_)
 
 
-@dataclass(frozen=True)
-class Raw:
+@dataclass
+class Raw(NixType):
     value: str
+
+    def dumps(self) -> str:
+        return self.value
 
 
 def raw(value: str) -> Raw:
     return Raw(value)
 
 
-@dataclass(frozen=True)
-class Call:
+@dataclass
+class Call(NixType):
     func: Raw
     args: tuple[NixValue, ...]
+
+    def dumps(self) -> str:
+        return _call(self)
 
 
 def call(func: str, *args: NixValue) -> Call:
@@ -38,12 +53,12 @@ def attrs(**kwargs: NixValue) -> dict[str, NixValue]:
     return kwargs
 
 
-@dataclass(frozen=True)
-class With:
+@dataclass
+class With(NixType):
     var: str
     expr: NixValue
 
-    def render(self) -> str:
+    def dumps(self) -> str:
         return f"with {self.var}; {dumps(self.expr)}"
 
 
@@ -51,18 +66,7 @@ def with_(var: str, expr: NixValue) -> With:
     return With(var, expr)
 
 
-NixValue = (
-    bool
-    | str
-    | int
-    | float
-    | dict[str, "NixValue"]
-    | Let
-    | Raw
-    | Call
-    | list["NixValue"]
-    | With
-)
+NixValue = bool | str | int | float | dict[str, "NixValue"] | list["NixValue"] | NixType
 
 
 def dumps(n: NixValue) -> str:
@@ -74,7 +78,7 @@ def dumps(n: NixValue) -> str:
         case int() | float():
             return str(n)
         case str():
-            if "\n" in n:
+            if "\n" in n or '"' in n:
                 return f"''{n}''"
             else:
                 return f'"{n}"'
@@ -82,14 +86,8 @@ def dumps(n: NixValue) -> str:
             return _attrset(n)
         case list():
             return "[ " + " ".join([_dumps(x) for x in n]) + " ]"
-        case Let():
-            return _let(n)
-        case Raw(raw_str):
-            return raw_str
-        case Call():
-            return _call(n)
-        case With():
-            return n.render()
+        case NixType():
+            return n.dumps()
 
 
 def _dumps(n: NixValue) -> str:

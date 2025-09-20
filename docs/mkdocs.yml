@@ -1,6 +1,0 @@
-docs_dir: content
-nav:
-- API Documentation: index.md
-repo_name: GitHub
-repo_url: https://github.com/chadac/py-nix-shell
-site_name: py-nix-shell
