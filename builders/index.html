@@ -432,6 +432,29 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../usage/activate/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Nix shell activation
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -849,33 +872,6 @@ nix = from_flake(flake=&quot;path:/to/your/flake.nix&quot;)
 # but you can specify alternatives
 nix = from_flake(flake=&quot;path:/to/your/flake.nix#devShells.alternate&quot;)
 </code></pre>
-<h1 id="advanced-usage">Advanced Usage</h1>
-<h2 id="pure-evaluation">Pure evaluation</h2>
-<p>By default, all Nix shell evaluations in <code>py-nix-shell</code> are pure. This
-means that generally your <code>shell.nix</code> files can't access user
-envirnonment variables, and you can't access other files on the
-filesystem from Nix.</p>
-<p>In order to disable this behavior, you can pass <code>impure=True</code>:</p>
-<pre><code class="language-python">nix = nix_shell.from_nix(&quot;/path/to/your/shell.nix&quot;, impure=True)
-</code></pre>
-<h2 id="nixpkgs-version-locking"><code>nixpkgs</code> version locking</h2>
-<p>This is specific only to <code>mk_shell</code> and <code>from_nix</code>. <code>from_flake</code> only
-uses the <code>nixpkgs</code> version as specified in the `flake.lock file.</p>
-<p>In order to support pure evaluation, <code>py-nix-shell</code> direclty manages
-the version of <code>nixpkgs</code> you use. You can control this behavior by
-passing the following:</p>
-<ul>
-<li><strong>default behavior</strong>: Uses the version specified in this project's <a href="https://github.com/chadac/py-nix-shell/blob/main/flake.lock">flake.lock</a>. The package is updated weekly so that you can automatically keep your <code>nixpkgs</code> version up-to-date if needed.</li>
-<li><code>use_global_nixpkgs=True</code>: If you'd prefer to use the version of
-  <code>nixpkgs</code> the user has locally, you can specify <code>use_global_nixpkgs</code>
-  command. This extracts the <code>nixpkgs</code> version from <code>nix flake
-  metadata nixpkgs</code>.</li>
-<li><code>flake_lock=Path("./to/your/flake.lock")</code>: You may also use a
-  <code>flake.lock</code> file. This will check for a <code>nixpkgs</code> entry and use
-  that version. If your <code>flake.lock</code> keeps its <code>nixpkgs</code> version under
-  a different name, you can use
-  <code>flake_lock_name="alternative_nixpkgs"</code> to specify.</li>
-</ul>
 
 
 

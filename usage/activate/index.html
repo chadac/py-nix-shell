@@ -9,10 +9,10 @@
       
       
       
-        <link rel="prev" href="../build/">
+        <link rel="prev" href="../subprocess/">
       
       
-        <link rel="next" href="../exceptions/">
+        <link rel="next" href="../../advanced/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -20,7 +20,7 @@
     
     
       
-        <title>constants - py-nix-shell</title>
+        <title>Nix shell activation - py-nix-shell</title>
       
     
     
@@ -74,7 +74,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#nix_shell.constants" class="md-skip">
+        <a href="#nix-shell-activation" class="md-skip">
           Skip to content
         </a>
       
@@ -110,7 +110,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              constants
+              Nix shell activation
             
           </span>
         </div>
@@ -283,18 +283,20 @@
       
   
   
+    
   
   
+  
     
     
     
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
         
           
           <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
@@ -310,7 +312,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
             Usage
@@ -324,7 +326,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../usage/shell.py/" class="md-nav__link">
+      <a href="../shell.py/" class="md-nav__link">
         
   
   
@@ -347,7 +349,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../usage/subprocess/" class="md-nav__link">
+      <a href="../subprocess/" class="md-nav__link">
         
   
   
@@ -367,10 +369,19 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../usage/activate/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -381,6 +392,7 @@
   
 
       </a>
+      
     </li>
   
 
@@ -419,20 +431,18 @@
       
   
   
-    
   
   
-  
     
     
     
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
         
           
           <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
@@ -448,7 +458,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
             API
@@ -459,20 +469,18 @@
                 
   
   
-    
   
   
-  
     
     
     
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_1" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_1" >
         
           
           <label class="md-nav__link" for="__nav_5_1" id="__nav_5_1_label" tabindex="0">
@@ -488,7 +496,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_1_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_1_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_5_1">
             <span class="md-nav__icon md-icon"></span>
             nix_shell
@@ -502,7 +510,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../" class="md-nav__link">
+      <a href="../../api/" class="md-nav__link">
         
   
   
@@ -525,7 +533,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../builders/" class="md-nav__link">
+      <a href="../../api/builders/" class="md-nav__link">
         
   
   
@@ -548,7 +556,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../build/" class="md-nav__link">
+      <a href="../../api/build/" class="md-nav__link">
         
   
   
@@ -568,30 +576,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    constants
-    
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../api/constants/" class="md-nav__link">
         
   
   
@@ -602,51 +590,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#nix_shell.constants" class="md-nav__link">
-    <span class="md-ellipsis">
-      constants
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#nix_shell.constants.CACHE_ROOT" class="md-nav__link">
-    <span class="md-ellipsis">
-      CACHE_ROOT
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#nix_shell.constants.PKG_FLAKE_LOCK" class="md-nav__link">
-    <span class="md-ellipsis">
-      PKG_FLAKE_LOCK
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -659,7 +602,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../exceptions/" class="md-nav__link">
+      <a href="../../api/exceptions/" class="md-nav__link">
         
   
   
@@ -682,7 +625,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../flake/" class="md-nav__link">
+      <a href="../../api/flake/" class="md-nav__link">
         
   
   
@@ -705,7 +648,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../nixlang/" class="md-nav__link">
+      <a href="../../api/nixlang/" class="md-nav__link">
         
   
   
@@ -728,7 +671,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../_nix/" class="md-nav__link">
+      <a href="../../api/_nix/" class="md-nav__link">
         
   
   
@@ -776,41 +719,8 @@
   
   
   
+    
   
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#nix_shell.constants" class="md-nav__link">
-    <span class="md-ellipsis">
-      constants
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#nix_shell.constants.CACHE_ROOT" class="md-nav__link">
-    <span class="md-ellipsis">
-      CACHE_ROOT
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#nix_shell.constants.PKG_FLAKE_LOCK" class="md-nav__link">
-    <span class="md-ellipsis">
-      PKG_FLAKE_LOCK
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
   
 </nav>
                   </div>
@@ -826,88 +736,34 @@
 
 
 
-  <h1>constants</h1>
+<h1 id="nix-shell-activation">Nix shell activation</h1>
+<p>In some cases, you may want to distribute Nix utilities alongside an
+application. For example:</p>
+<ol>
+<li>For use with a Python CLI utility that needs to call specific
+   versions of dependencies;</li>
+<li>To ensure complex Python applications that depend on calling
+   <code>subprocess.run</code> are able to source the Python path properly;</li>
+<li>To work around weird issues such as with OSX's <a href="https://developer.apple.com/library/archive/documentation/Security/Conceptual/System_Integrity_Protection_Guide/RuntimeProtections/RuntimeProtections.html">SIP
+   protection</a>
+   so that Python applications always link the proper library versions
+   of packages.</li>
+</ol>
+<p>Usage is simple:</p>
+<pre><code class="language-python">import nix_shell
 
-<div class="doc doc-object doc-module">
+shell = nix_shell.mk_shell(packages=[&quot;curl&quot;], library_path=[&quot;zlib&quot;])
 
+shell.activate()
 
+# subprocess.run now prefers the Nix versions of packages
+import subprocess
+subprocess.run([&quot;which&quot;, &quot;curl&quot;])
 
-<a id="nix_shell.constants"></a>
-    <div class="doc doc-contents first">
-
-
-
-
-
-
-
-
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-<div class="doc doc-object doc-attribute">
-
-
-
-<h2 id="nix_shell.constants.CACHE_ROOT" class="doc doc-heading">
-            <span class="doc doc-object-name doc-attribute-name">CACHE_ROOT</span>
-
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
-  </span>
-
-</h2>
-<div class="doc-signature highlight"><pre><span></span><code><span class="n">CACHE_ROOT</span> <span class="o">=</span> <span class="n"><span title="expanduser">expanduser</span></span><span class="p">()</span> <span class="o">/</span> <span class="s1">&#39;py-nix-shell&#39;</span>
-</code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Location of the cache directory used for persisting some shells.</p>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-attribute">
-
-
-
-<h2 id="nix_shell.constants.PKG_FLAKE_LOCK" class="doc doc-heading">
-            <span class="doc doc-object-name doc-attribute-name">PKG_FLAKE_LOCK</span>
-
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
-  </span>
-
-</h2>
-<div class="doc-signature highlight"><pre><span></span><code><span class="n">PKG_FLAKE_LOCK</span> <span class="o">=</span> <span class="n"><span title="parent">parent</span></span> <span class="o">/</span> <span class="s1">&#39;flake.lock&#39;</span>
-</code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Path to the <code>flake.lock</code> file distributed with the project.</p>
-
-    </div>
-
-</div>
-
-
-
-
-
-  </div>
-
-    </div>
-
-</div>
+# libraries like `ctypes` will also behave properly
+import ctypes.util
+ctypes.util.find_library(&quot;z&quot;)
+</code></pre>
 
 
 
