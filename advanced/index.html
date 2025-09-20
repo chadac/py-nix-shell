@@ -9,25 +9,25 @@
       
       
       
-        <link rel="prev" href="../../advanced/">
+        <link rel="prev" href="../usage/subprocess/">
       
       
-        <link rel="next" href="../builders/">
+        <link rel="next" href="../api/root/">
       
       
-      <link rel="icon" href="../../assets/images/favicon.png">
+      <link rel="icon" href="../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.16">
     
     
       
-        <title>Root - py-nix-shell</title>
+        <title>Advanced - py-nix-shell</title>
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.7e37652d.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.7e37652d.min.css">
       
         
-        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
       
       
 
@@ -46,9 +46,9 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
     
-    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -74,7 +74,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#nix_shell" class="md-skip">
+        <a href="#advanced-usage" class="md-skip">
           Skip to content
         </a>
       
@@ -90,7 +90,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../.." title="py-nix-shell" class="md-header__button md-logo" aria-label="py-nix-shell" data-md-component="logo">
+    <a href=".." title="py-nix-shell" class="md-header__button md-logo" aria-label="py-nix-shell" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -110,7 +110,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Root
+              Advanced
             
           </span>
         </div>
@@ -224,7 +224,7 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../.." title="py-nix-shell" class="md-nav__button md-logo" aria-label="py-nix-shell" data-md-component="logo">
+    <a href=".." title="py-nix-shell" class="md-nav__button md-logo" aria-label="py-nix-shell" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -242,7 +242,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../.." class="md-nav__link">
+      <a href=".." class="md-nav__link">
         
   
   
@@ -264,7 +264,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../builders/" class="md-nav__link">
+      <a href="../builders/" class="md-nav__link">
         
   
   
@@ -324,7 +324,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../usage/shell.py/" class="md-nav__link">
+      <a href="../usage/shell.py/" class="md-nav__link">
         
   
   
@@ -347,7 +347,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../usage/subprocess/" class="md-nav__link">
+      <a href="../usage/subprocess/" class="md-nav__link">
         
   
   
@@ -374,10 +374,32 @@
       
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../advanced/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Advanced
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -388,6 +410,53 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#pure-evaluation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Pure evaluation
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#nixpkgs-version-locking" class="md-nav__link">
+    <span class="md-ellipsis">
+      nixpkgs version locking
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#file-sets" class="md-nav__link">
+    <span class="md-ellipsis">
+      File sets
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -396,20 +465,18 @@
       
   
   
-    
   
   
-  
     
     
     
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
         
           
           <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
@@ -425,7 +492,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
             API
@@ -436,20 +503,18 @@
                 
   
   
-    
   
   
-  
     
     
     
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_1" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_1" >
         
           
           <label class="md-nav__link" for="__nav_5_1" id="__nav_5_1_label" tabindex="0">
@@ -465,7 +530,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_1_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_1_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_5_1">
             <span class="md-nav__icon md-icon"></span>
             nix_shell
@@ -476,30 +541,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    Root
-    
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../api/root/" class="md-nav__link">
         
   
   
@@ -510,60 +555,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#nix_shell" class="md-nav__link">
-    <span class="md-ellipsis">
-      nix_shell
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#nix_shell.from_flake" class="md-nav__link">
-    <span class="md-ellipsis">
-      from_flake
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#nix_shell.from_nix" class="md-nav__link">
-    <span class="md-ellipsis">
-      from_nix
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#nix_shell.mk_shell" class="md-nav__link">
-    <span class="md-ellipsis">
-      mk_shell
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -576,7 +567,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../builders/" class="md-nav__link">
+      <a href="../api/builders/" class="md-nav__link">
         
   
   
@@ -599,7 +590,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../constants/" class="md-nav__link">
+      <a href="../api/constants/" class="md-nav__link">
         
   
   
@@ -622,7 +613,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../exceptions/" class="md-nav__link">
+      <a href="../api/exceptions/" class="md-nav__link">
         
   
   
@@ -645,7 +636,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../flake/" class="md-nav__link">
+      <a href="../api/flake/" class="md-nav__link">
         
   
   
@@ -668,7 +659,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../nixlang/" class="md-nav__link">
+      <a href="../api/nixlang/" class="md-nav__link">
         
   
   
@@ -691,7 +682,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../nix_subprocess.md" class="md-nav__link">
+      <a href="../api/nix_subprocess.md" class="md-nav__link">
         
   
   
@@ -714,7 +705,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../_nix/" class="md-nav__link">
+      <a href="../api/_nix/" class="md-nav__link">
         
   
   
@@ -762,6 +753,8 @@
   
   
   
+    
+  
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
@@ -770,36 +763,27 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#nix_shell" class="md-nav__link">
+  <a href="#pure-evaluation" class="md-nav__link">
     <span class="md-ellipsis">
-      nix_shell
+      Pure evaluation
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#nix_shell.from_flake" class="md-nav__link">
+  <a href="#nixpkgs-version-locking" class="md-nav__link">
     <span class="md-ellipsis">
-      from_flake
+      nixpkgs version locking
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#nix_shell.from_nix" class="md-nav__link">
+  <a href="#file-sets" class="md-nav__link">
     <span class="md-ellipsis">
-      from_nix
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#nix_shell.mk_shell" class="md-nav__link">
-    <span class="md-ellipsis">
-      mk_shell
+      File sets
     </span>
   </a>
   
@@ -821,115 +805,78 @@
 
 
 
-  <h1>Root</h1>
-
-<div class="doc doc-object doc-module">
-
-
-
-<a id="nix_shell"></a>
-    <div class="doc doc-contents first">
-
-
-
-
-
-
-
-
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h2 id="nix_shell.from_flake" class="doc doc-heading">
-            <span class="doc doc-object-name doc-function-name">from_flake</span>
-
-
-</h2>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">from_flake</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n"><span title="typing.Unpack">Unpack</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="FlakeRefParams (nix_shell.builders.FlakeRefParams)" href="../builders/#nix_shell.builders.FlakeRefParams">FlakeRefParams</a></span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-internal" title="NixShell
-
-
-  
-      dataclass
-   (nix_shell.build.NixShell)" href="../build/#nix_shell.build.NixShell">NixShell</a></span>
-</code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Create a Nix shell from a flake.</p>
-
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h2 id="nix_shell.from_nix" class="doc doc-heading">
-            <span class="doc doc-object-name doc-function-name">from_nix</span>
-
-
-</h2>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">from_nix</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n"><span title="typing.Unpack">Unpack</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="MkNixParams (nix_shell.builders.MkNixParams)" href="../builders/#nix_shell.builders.MkNixParams">MkNixParams</a></span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-internal" title="NixShell
-
-
-  
-      dataclass
-   (nix_shell.build.NixShell)" href="../build/#nix_shell.build.NixShell">NixShell</a></span>
-</code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Create a Nix shell from a <code>shell.nix</code> file.</p>
-
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h2 id="nix_shell.mk_shell" class="doc doc-heading">
-            <span class="doc doc-object-name doc-function-name">mk_shell</span>
-
-
-</h2>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">mk_shell</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n"><span title="typing.Unpack">Unpack</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="MkShellParams (nix_shell.builders.MkShellParams)" href="../builders/#nix_shell.builders.MkShellParams">MkShellParams</a></span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-internal" title="NixShell
-
-
-  
-      dataclass
-   (nix_shell.build.NixShell)" href="../build/#nix_shell.build.NixShell">NixShell</a></span>
-</code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Create a Nix shell dynamically from Python.</p>
-
-
-    </div>
-
-</div>
-
-
-
-  </div>
-
-    </div>
-
-</div>
+<h1 id="advanced-usage">Advanced Usage</h1>
+<h2 id="pure-evaluation">Pure evaluation</h2>
+<p><code>py-nix-shell</code> encourages <a href="https://nix.dev/manual/nix/2.24/command-ref/conf-file.html#conf-pure-eval"><em>pure Nix
+evaluation</em></a>
+-- in other words, it explicitly declares the versions of inputs used
+up-front and disables impure evaluation capabilities like accessing
+environment variables or random files on your filesystem while writing
+Nix code.</p>
+<p>This is largely because when your evaluation is pure, it's a whole lot
+easier to cache the result of Nix shells and quickly access the
+results of those caches without much additional specification.</p>
+<p>It is possible to supplement impure requirements in your Nix
+files. For example, if you wanted to pass certain environment
+variables to a <code>shell.nix</code>, you could do:</p>
+<pre><code class="language-python">import nix_shell
+shell = nix_shell.from_nix(&quot;shell.nix&quot;, args={
+  &quot;pythonVersion&quot;: os.environ.get(&quot;PYTHON_VERSION&quot;, &quot;python313&quot;),
+  &quot;env&quot;: {
+    &quot;MY_FLAG&quot;: os.environ.get(&quot;MY_FLAG&quot;, &quot;&quot;)
+  }
+})
+</code></pre>
+<p>This is then passed as an argument to your <code>shell.nix</code>:</p>
+<pre><code class="language-nix">{ pkgs, pythonVersion, env }:
+pkgs.mkShell {
+  packages = [ pkgs.${pythonVersion} ];
+  shellHook = ''
+    export MY_FLAG='${env.MY_FLAG}'
+  '';
+}
+</code></pre>
+<p>To disable this behavior, pass <code>impure=True</code>:</p>
+<pre><code class="language-python">nix = nix_shell.from_nix(&quot;/path/to/your/shell.nix&quot;, impure=True)
+</code></pre>
+<p>Be warned that certain caching features are not guaranteed to work in
+impure mode.</p>
+<h2 id="nixpkgs-version-locking"><code>nixpkgs</code> version locking</h2>
+<p><strong>NOTE</strong>: This does not apply to <code>from_flake</code>, which uses only input
+versions from your <code>flake.lock</code>.</p>
+<p>In order to support pure evaluation, <code>py-nix-shell</code> directly manages
+the version of <code>nixpkgs</code> you use. You can control this behavior by
+passing the following:</p>
+<ul>
+<li><strong>default behavior</strong>: Uses the version specified in this project's <a href="https://github.com/chadac/py-nix-shell/blob/main/flake.lock">flake.lock</a>. The package is updated weekly so that you can automatically keep your <code>nixpkgs</code> version up-to-date if needed.</li>
+<li><code>use_global_nixpkgs=True</code>: If you'd prefer to use the version of
+  <code>nixpkgs</code> the user has locally, you can specify <code>use_global_nixpkgs</code>
+  command. This extracts the <code>nixpkgs</code> version from <code>nix flake
+  metadata nixpkgs</code>.</li>
+<li><code>flake_lock=Path("./to/your/flake.lock")</code>: You may also use a
+  <code>flake.lock</code> file. This will check for a <code>nixpkgs</code> entry and use
+  that version. If your <code>flake.lock</code> keeps its <code>nixpkgs</code> version under
+  a different name, you can use
+  <code>flake_lock_name="alternative_nixpkgs"</code> to specify.</li>
+</ul>
+<h2 id="file-sets">File sets</h2>
+<p>Because Nix doesn't really provide a means of purely managing many Nix
+files beyond version tracking like Git, <code>py-nix-shell</code> does provide a
+layer to supplement this functionality:</p>
+<pre><code class="language-python">shell = nix_shell.from_fileset(
+  main=&quot;shell.nix&quot;,
+  files=Path.cwd().glob(&quot;**.nix&quot;)
+)
+</code></pre>
+<p>This is useful when you might have dev shells inside a Nix package
+that do not necessarily need the entire Git repository to update the
+shell. This can save on load times, especially since many shells do
+not necessarily depend on the full contents of a repository.</p>
+<pre><code>{ pkgs }:
+let
+  myPackage = pkgs.callPackage ./my-package.nix {};
+in pkgs.mkShell { packages = [ myPackage ]; }
+</code></pre>
 
 
 
@@ -978,10 +925,10 @@
     
     
       
-      <script id="__config" type="application/json">{"base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../../assets/javascripts/bundle.50899def.min.js"></script>
+      <script src="../assets/javascripts/bundle.50899def.min.js"></script>
       
     
   </body>
