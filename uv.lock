@@ -459,6 +459,7 @@ dev = [
     { name = "mypy" },
     { name = "pytest" },
     { name = "pytest-isolate" },
+    { name = "pytest-snapshot" },
     { name = "ruff" },
 ]
 
@@ -471,6 +472,7 @@ dev = [
     { name = "mypy", specifier = ">=1.17.0" },
     { name = "pytest", specifier = ">=8.4.1" },
     { name = "pytest-isolate", specifier = ">=0.0.13" },
+    { name = "pytest-snapshot", specifier = ">=0.9.0" },
     { name = "ruff", specifier = ">=0.12.5" },
 ]
 
@@ -572,6 +574,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/f2/60/b431cc5995cc07953446fb96c8675fed0db4759a95d949726584746733c0/pytest_isolate-0.0.13.tar.gz", hash = "sha256:108fd19a62e09f7c71ff212229c69fbdec3632137dce7da2cdfe7926faf9a13b", size = 16058, upload-time = "2025-09-08T15:19:31.731Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/74/c1/bd71f2f80f027625d221d3774245bdec8f77f57854261727f477d5a03161/pytest_isolate-0.0.13-py3-none-any.whl", hash = "sha256:17a50bc5f14ff37b48c150f926e9656e8b18ea87df66182a131051e673c28ed0", size = 14275, upload-time = "2025-09-08T15:19:30.837Z" },
+]
+
+[[package]]
+name = "pytest-snapshot"
+version = "0.9.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pytest" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/9b/7b/ab8f1fc1e687218aa66acec1c3674d9c443f6a2dc8cb6a50f464548ffa34/pytest-snapshot-0.9.0.tar.gz", hash = "sha256:c7013c3abc3e860f9feff899f8b4debe3708650d8d8242a61bf2625ff64db7f3", size = 19877, upload-time = "2022-04-23T17:35:31.751Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/cb/29/518f32faf6edad9f56d6e0107217f7de6b79f297a47170414a2bd4be7f01/pytest_snapshot-0.9.0-py3-none-any.whl", hash = "sha256:4b9fe1c21c868fe53a545e4e3184d36bc1c88946e3f5c1d9dd676962a9b3d4ab", size = 10715, upload-time = "2022-04-23T17:35:30.288Z" },
 ]
 
 [[package]]

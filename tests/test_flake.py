@@ -1,4 +1,4 @@
-from nix_shell import nixlang
+from nix_shell import expr
 from nix_shell.flake import get_impure_nixpkgs_ref, to_fetch_tree
 
 
@@ -13,8 +13,8 @@ def test_fetch_tree():
         "type": "github",
     }
     expected = {
-        "nixpkgsTree": nixlang.call("builtins.fetchTree", attrs),
-        "nixpkgs": nixlang.raw("nixpkgsTree.outPath"),
+        "nixpkgsTree": expr.call("builtins.fetchTree", attrs),
+        "nixpkgs": expr.raw("nixpkgsTree.outPath"),
     }
 
     # both should return the same result

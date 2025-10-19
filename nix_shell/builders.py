@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import NotRequired, TypedDict, Unpack
 
-from nix_shell import _nix, nixlang
+from nix_shell import cli, expr
 from nix_shell.build import NixShell
 from nix_shell.constants import PKG_FLAKE_LOCK
 from nix_shell.flake import (
@@ -69,13 +69,13 @@ class MkShellParams(NixpkgsParams):
     build_inputs: NotRequired[list[str]]
     library_path: NotRequired[list[str]]
     shell_hook: NotRequired[list[str]]
-    extra_args: NotRequired[dict[str, nixlang.NixValue]]
+    extra_args: NotRequired[dict[str, expr.NixExpr]]
     system: NotRequired[str]
 
 
-def _with_pkgs(pkgs: list[str | nixlang.NixValue]) -> nixlang.NixValue:
-    return nixlang.with_(
-        "pkgs", [nixlang.raw(pkg) if isinstance(pkg, str) else pkg for pkg in pkgs]
+def _with_pkgs(pkgs: list[str | expr.NixExpr]) -> expr.NixExpr:
+    return expr.with_(
+        "pkgs", [expr.raw(pkg) if isinstance(pkg, str) else pkg for pkg in pkgs]
     )
 
 
@@ -84,7 +84,7 @@ def from_flake(**kwargs: Unpack[FlakeRefParams]) -> NixShell:
     return NixShell.create(ref=kwargs["flake"])
 
 
-def parse_nixpkgs_tree(**kwargs: Unpack[NixpkgsParams]) -> dict[str, nixlang.NixValue]:
+def parse_nixpkgs_tree(**kwargs: Unpack[NixpkgsParams]) -> dict[str, expr.NixExpr]:
     """Determine the version of `nixpkgs` to use."""
     if "nixpkgs" in kwargs:
         nixpkgs_tree = to_fetch_tree(kwargs["nixpkgs"])
@@ -108,7 +108,7 @@ def from_nix(**kwargs: Unpack[MkNixParams]) -> NixShell:
     """Create a Nix shell from a `shell.nix` file."""
     include: dict[str, str] = {}
     if "nixpkgs" in kwargs:
-        include["nixpkgs"] = _nix.flake.metadata(kwargs["nixpkgs"])["locked"]["path"]
+        include["nixpkgs"] = cli.flake.metadata(kwargs["nixpkgs"])["locked"]["path"]
     elif "use_global_nixpkgs" in kwargs:
         include["nixpkgs"] = get_impure_nixpkgs_ref()["path"]
     elif "flake_lock" in kwargs:
@@ -122,51 +122,51 @@ def from_nix(**kwargs: Unpack[MkNixParams]) -> NixShell:
 
 
 @dataclass
-class NixShellBuilder(nixlang.NixType):
-    nixpkgs_tree: dict[str, nixlang.NixValue]
-    packages: list[str | nixlang.NixValue] = field(default_factory=list)
-    inputs_from: list[str | nixlang.NixValue] = field(default_factory=list)
-    build_inputs: list[str | nixlang.NixValue] = field(default_factory=list)
-    library_path: list[str | nixlang.NixValue] = field(default_factory=list)
-    extra_args: dict[str, nixlang.NixValue] = field(default_factory=lambda: {})
+class NixShellBuilder(expr.NixCompoundType):
+    nixpkgs_tree: dict[str, expr.NixExpr]
+    packages: list[str | expr.NixExpr] = field(default_factory=list)
+    inputs_from: list[str | expr.NixExpr] = field(default_factory=list)
+    build_inputs: list[str | expr.NixExpr] = field(default_factory=list)
+    library_path: list[str | expr.NixExpr] = field(default_factory=list)
+    extra_args: dict[str, expr.NixExpr] = field(default_factory=lambda: {})
     shell_hook: list[str] = field(default_factory=list)
-    system: str = field(default_factory=_nix.current_system)
+    system: str = field(default_factory=cli.current_system)
 
-    def add_package(self, pkg: str | nixlang.NixValue) -> None:
+    def add_package(self, pkg: str | expr.NixExpr) -> None:
         self.packages.append(pkg)
 
-    def add_input(self, pkg: str | nixlang.NixValue) -> None:
+    def add_input(self, pkg: str | expr.NixExpr) -> None:
         self.inputs_from.append(pkg)
 
-    def add_build_input(self, pkg: str | nixlang.NixValue) -> None:
+    def add_build_input(self, pkg: str | expr.NixExpr) -> None:
         self.build_inputs.append(pkg)
 
     def _nix_library_path(self) -> str | None:
         if self.library_path:
-            return f"${{pkgs.lib.makeLibraryPath ({nixlang.dumps(_with_pkgs(list(self.library_path)))})}}"
+            return f"${{pkgs.lib.makeLibraryPath ({expr.dumps(_with_pkgs(list(self.library_path)))})}}"
         else:
             return None
 
     @property
-    def _expr(self) -> nixlang.NixValue:
+    def _expr(self) -> expr.NixExpr:
         shell_hook = list(self.shell_hook)
         if library_path := self._nix_library_path():
             shell_hook.append(
                 f'export LD_LIBRARY_PATH=\\"{library_path}:$LD_LIBRARY_PATH\\"'
             )
 
-        return nixlang.let(
+        return expr.let(
             **self.nixpkgs_tree,
-            pkgs=nixlang.call(
+            pkgs=expr.call(
                 "import",
-                nixlang.raw("nixpkgs"),
-                nixlang.attrs(
+                expr.raw("nixpkgs"),
+                expr.attrs(
                     system=self.system,
                 ),
             ),
-            in_=nixlang.call(
+            in_=expr.call(
                 "pkgs.mkShell",
-                nixlang.attrs(
+                expr.attrs(
                     packages=_with_pkgs(self.packages),
                     inputsFrom=_with_pkgs(self.inputs_from),
                     buildInputs=_with_pkgs(self.build_inputs),
@@ -177,7 +177,7 @@ class NixShellBuilder(nixlang.NixType):
         )
 
     def dumps(self) -> str:
-        return nixlang.dumps(self._expr)
+        return expr.dumps(self._expr)
 
 
 def mk_shell_expr(
@@ -193,9 +193,9 @@ def mk_shell_expr(
         library_path=kwargs.get("library_path", []),  # type: ignore
         extra_args=kwargs.get("extra_args", {}),
         shell_hook=kwargs.get("shell_hook", []),
-        system=kwargs.get("system", _nix.current_system()),
+        system=kwargs.get("system", cli.current_system()),
     )
-    return nixlang.dumps(shell)
+    return expr.dumps(shell)
 
 
 def mk_shell(**kwargs: Unpack[MkShellParams]) -> NixShell:
@@ -214,7 +214,7 @@ def mk_shell(**kwargs: Unpack[MkShellParams]) -> NixShell:
 #     """
 #     main: Path
 #     files: list[Path]
-#     nixpkgs_ref: dict[str, nixlang.NixValue]
+#     nixpkgs_ref: dict[str, expr.NixExpr]
 
-#     def _expr(self) -> nixlang.NixValue:
+#     def _expr(self) -> expr.NixExpr:
 #         pass
