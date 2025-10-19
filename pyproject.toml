@@ -11,7 +11,7 @@ requires-python = ">=3.10"
 dependencies = []
 
 [project.scripts]
-py-nix-shell = "nix_shell.cli:main"
+pynix = "nix_shell.main:main"
 
 [dependency-groups]
 dev = [
@@ -29,6 +29,11 @@ dev = [
 
 [tool.mypy]
 modules = ["nix_shell", "tests"]
+
+# [tool.pytest.ini_options]
+# log_cli = true
+# log_cli_level = "DEBUG"
+# log_cli_format = "%(asctime)s [%(levelname)8s] %(name)s: %(message)s"
 
 [[tool.pydoc-markdown.loaders]]
 type = "python"

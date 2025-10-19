@@ -10,3 +10,6 @@ devenv.local.nix
 
 # mkdocs output
 /site/
+
+# claude
+.claude

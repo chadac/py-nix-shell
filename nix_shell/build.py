@@ -212,17 +212,20 @@ class NixShell(NixBuild):
             else:
                 os.environ[key] = value
 
-    def _process_args(self, cmd: list[str] | str, **kwargs) -> Any:
+    def _process_args(
+        self, cmd: list[str] | str, impure_env: bool = False, **kwargs
+    ) -> Any:
         """
         Transforms arguments to `subprocess.Popen` (and associated) to use Nix.
 
         It works by prepending the output of `nix print-dev-env` to each
         shell invocation.
         """
+        default_env = dict(os.environ) if impure_env else {}
         new_kwargs = {
             **kwargs,
             **{
-                "env": kwargs.get("env", {}),
+                "env": kwargs.get("env", default_env),
             },
         }
         script = self.dev_env + "\n"
@@ -268,3 +271,21 @@ class NixShell(NixBuild):
     def getstatusoutput(self, *args, **kwargs) -> tuple[int, str]:
         """See [subprocess.getstatusoutput](https://docs.python.org/3/library/subprocess.html#subprocess.getstatusoutput)"""
         return self._exec(subprocess.getstatusoutput, *args, **kwargs)
+
+    def spawn(self) -> None:
+        """Spawn a new interactive shell with this Nix environment activated."""
+        from nix_shell import cli
+
+        # Use nix develop for mkShell derivations, nix shell for packages
+        try:
+            # For mkShell-based environments, use nix develop
+            if hasattr(cli, "develop"):
+                cli.develop(**self.params)
+            else:
+                # Fallback to shell if develop doesn't exist
+                cli.shell(**self.params)
+        except KeyboardInterrupt:
+            # Handle Ctrl+C gracefully
+            print("\nExiting nix shell...")
+        except Exception as e:
+            print(f"Error starting nix shell: {e}", file=sys.stderr)

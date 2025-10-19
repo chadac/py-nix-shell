@@ -6,6 +6,10 @@ from functools import cache
 from pathlib import Path
 from typing import NotRequired, TypedDict, Unpack
 
+from nix_shell.utils import format_nix
+
+from .exceptions import wrap_subprocess_error
+
 
 class NixBuildArgs(TypedDict):
     """
@@ -40,7 +44,7 @@ def _parse_args(
     if "ref" in params:
         args += [params["ref"]]
     elif "expr" in params:
-        args += ["--expr", params["expr"]]
+        args += ["--expr", format_nix(params["expr"])]
     elif "file" in params:
         args += ["-f", str(params["file"])]
         if "installable" in params:
@@ -52,11 +56,14 @@ def _parse_args(
     return args
 
 
+@wrap_subprocess_error
 def _cmd(
     cmd: str | list[str] = "build",
     extra_args: list[str] = [],
     **params: Unpack[NixBuildArgs],
 ) -> str:
+    import logging
+
     args = _parse_args(**params) + extra_args
 
     if isinstance(cmd, str):
@@ -64,7 +71,37 @@ def _cmd(
     else:
         cmds = cmd
 
-    return subprocess.check_output(["nix"] + cmds + args).decode()
+    full_cmd = ["nix"] + cmds + args
+    logger = logging.getLogger("py-nix-shell")
+
+    # Log the command at DEBUG level
+    logger.debug(f"Running command: {' '.join(full_cmd)}")
+
+    # Check if we should capture stderr for -vvv mode
+    if logger.isEnabledFor(logging.DEBUG):
+        full_cmd += ["--show-trace"]
+        # For debug mode, capture stderr to include in logs
+        try:
+            result = subprocess.run(
+                full_cmd,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                check=True,
+            )
+            if result.stderr:
+                logger.debug(f"Command stderr: {result.stderr}")
+            return result.stdout
+        except subprocess.CalledProcessError as e:
+            # Log the error details before re-raising
+            if e.stderr:
+                logger.debug(f"Command failed stderr: {e.stderr}")
+            if e.stdout:
+                logger.debug(f"Command failed stdout: {e.stdout}")
+            raise
+    else:
+        # Normal mode - just use check_output
+        return subprocess.check_output(full_cmd).decode()
 
 
 def build(
@@ -103,6 +140,32 @@ def evaluate(
     return _cmd("eval", extra_args=extra_args, **params)
 
 
+@wrap_subprocess_error
+def _shell_cmd(
+    cmd: str | list[str] = "develop",
+    extra_args: list[str] = [],
+    **params: Unpack[NixBuildArgs],
+):
+    args = _parse_args(**params) + extra_args
+    if isinstance(cmd, str):
+        cmds = [cmd]
+    else:
+        cmds = cmd
+    return subprocess.run(
+        ["nix"] + cmds + args,
+        check=True,
+        text=True,
+    )
+
+
+def develop(**params: Unpack[NixBuildArgs]):
+    return _shell_cmd(**params)
+
+
+def shell(**params: Unpack[NixBuildArgs]):
+    return _shell_cmd(cmd="shell", **params)
+
+
 @cache
 def current_system() -> str:
     """
@@ -132,6 +195,7 @@ class derivation:
 
 class flake:
     @staticmethod
+    @wrap_subprocess_error
     def metadata(flake_ref: str) -> dict:
         """Run `nix flake metadata`"""
         return json.loads(
@@ -143,6 +207,7 @@ class flake:
 
 class store:
     @staticmethod
+    @wrap_subprocess_error
     def add(path: Path) -> str:
         return subprocess.check_output(
             ["nix", "store", "add", str(path.absolute())]

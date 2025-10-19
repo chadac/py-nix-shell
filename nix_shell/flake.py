@@ -2,15 +2,53 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
 import json
+from dataclasses import dataclass, field
 from pathlib import Path
+from typing import NotRequired, TypedDict
 
-from nix_shell import cli, expr
-from nix_shell.build import NixBuild
-from nix_shell.expr import NixExpr
+from nix_shell import cli
+from nix_shell.constants import PKG_FLAKE_LOCK
+from nix_shell.dsl import NixExpr
 
 FlakeRef = str | dict[str, NixExpr]
+
+
+class FlakeRefLock(TypedDict):
+    """
+    TypedDict matching the 'locked' field specification in flake.lock files.
+
+    This represents a locked flake reference with all the information needed
+    to reproducibly fetch the exact same content.
+
+    Based on the Nix flake.lock specification:
+    https://nixos.org/manual/nix/stable/command-ref/new-cli/nix3-flake.html#lock-files
+    """
+
+    # Common fields for all types
+    type: str  # e.g., "github", "gitlab", "sourcehut", "git", "file", etc.
+    lastModified: int  # Unix timestamp of last modification
+    narHash: str  # Content hash of the NAR (Nix Archive)
+
+    # GitHub/GitLab/SourceHut specific fields
+    owner: NotRequired[str]  # Repository owner
+    repo: NotRequired[str]  # Repository name
+    rev: NotRequired[str]  # Git revision/commit hash
+
+    # Git specific fields
+    url: NotRequired[str]  # Git URL for type="git"
+    ref: NotRequired[str]  # Git reference (branch/tag)
+
+    # File/path specific fields
+    path: NotRequired[str]  # Local file path for type="file" or type="path"
+
+    # Indirect flake registry fields
+    id: NotRequired[str]  # Flake ID for indirect references
+
+    # Additional optional fields that may appear
+    submodules: NotRequired[bool]  # Whether to fetch git submodules
+    shallow: NotRequired[bool]  # Whether to do shallow clone
+    host: NotRequired[str]  # Custom host for git forges
 
 
 @dataclass
@@ -30,14 +68,8 @@ class Flake:
     inputs: dict[str, FlakeInput]
     output: NixExpr
 
-    @property
-    def build(self):
-        return NixBuild(
-            inputs=
-        )
 
-
-def to_fetch_tree(ref: FlakeRef) -> dict[str, NixExpr]:
+def fetch_locked_from_flake_ref(ref: FlakeRef) -> FlakeRefLock:
     """
     Convert a [flake reference](https://nix.dev/manual/nix/2.28/command-ref/new-cli/nix3-flake.html#url-like-syntax) into a proper locked reference.
 
@@ -49,15 +81,12 @@ def to_fetch_tree(ref: FlakeRef) -> dict[str, NixExpr]:
         tree_ref.pop("__final", None)
     else:
         tree_ref = ref
-    return {
-        "nixpkgsTree": expr.call("builtins.fetchTree", tree_ref),
-        "nixpkgs": expr.raw("nixpkgsTree.outPath"),
-    }
+    return tree_ref
 
 
-def get_ref_from_lockfile(
-    flake_lock: Path | str, nixpkgs: str = "nixpkgs"
-) -> dict[str, NixExpr]:
+def get_locked_from_lockfile(
+    flake_lock: Path | str, name: str = "nixpkgs"
+) -> FlakeRefLock:
     """
     Grabs the locked reference for a given node from a `flake.lock`.
 
@@ -67,12 +96,16 @@ def get_ref_from_lockfile(
     """
     with open(flake_lock, "r") as f:
         lock = json.load(f)
-    locked = dict(lock["nodes"][nixpkgs]["locked"])
+    locked = dict(lock["nodes"][name]["locked"])
     locked.pop("__final", None)
     return locked
 
 
-def get_impure_nixpkgs_ref() -> dict:
+def get_locked_from_py_nix_shell(name: str) -> FlakeRefLock:
+    return get_locked_from_lockfile(PKG_FLAKE_LOCK, name)
+
+
+def get_locked_from_impure_nixpkgs() -> FlakeRefLock:
     """
     Get a locked reference to the version of `nixpkgs` from the local Nix channel.
     """

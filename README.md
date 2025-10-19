@@ -117,3 +117,24 @@ def cli():
     shell.activate()
     subprocess.run(["which", "curl"]) # will point to the Nix version
 ```
+
+## CLI usage
+
+```
+$ py-nix-shell --help
+py-nix-shell manages Nix shell environments on your behalf. https://github.com/chadac/py-nix-shell
+
+Usage: py-nix-shell [OPTIONS] [COMMAND]
+
+Commands:
+  activate       Initializes a new Nix shell in the given shell session from a `shell.py`
+  print-dev-env  Prints the bash instructions needed to activate a dev env.
+
+Options:
+  -c, --command <EXPR>
+      Evaluates a given Python expression to build the Nix shell.
+  --command-from-stdin
+      Evaluates a given Python expression from stdin and activates the environment.
+  -f <FILE>
+      Evaluates a file besides `shell.py` to build the Nix shell.
+```

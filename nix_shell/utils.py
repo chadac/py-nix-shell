@@ -1,6 +1,9 @@
 """Utility functions for nix_shell."""
 
+import logging
 import os
+import shutil
+import subprocess
 from pathlib import Path
 
 
@@ -38,3 +41,16 @@ def find_shared_root(paths: list[Path]) -> Path:
     except ValueError:
         # This can happen on Windows with different drives, but shouldn't on Unix
         return Path("/")  # Return root as fallback
+
+
+def format_nix(expr: str, raise_if_missing: bool = False) -> str:
+    if shutil.which("nixfmt"):
+        return subprocess.check_output(["nixfmt"], input=expr.encode()).decode()
+    elif not raise_if_missing:
+        logging.warning(
+            "nixfmt not found -- install it for expressions that are easier to debug"
+        )
+        return expr
+    else:
+        # TODO: Probably replace this with some `nix.run` logic.
+        raise RuntimeError("The `nixfmt` command is required.")

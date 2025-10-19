@@ -6,8 +6,9 @@ This file contains important information for Claude when working on this codebas
 
 Always run these commands before completing tasks to ensure code quality:
 
-- `just lint` - Run linting checks (ruff check + ruff format check + mypy)
-- `just format` - Auto-format code (ruff format + ruff check --fix)
+- `just check` - Check and auto-format code (just lint + ruff format + ruff check --fix)
+  - Prefer `just check` for all linting
+  - `just lint` - Run linting checks, don't modify (ruff check + ruff format check + mypy)
 - `just test` - Run the full test suite
 
 ## Testing
@@ -20,7 +21,7 @@ Always run these commands before completing tasks to ensure code quality:
 ## Module Naming
 
 Recent changes:
-- `_nix.py` has been renamed to `cli.py` 
+- `_nix.py` has been renamed to `cli.py`
 - All imports have been updated accordingly
 - Type names: use `NixExpr` (not `NixValue`), `NixCompoundType` (not `NixType`)
 
