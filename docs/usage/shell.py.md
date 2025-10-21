@@ -1,12 +1,12 @@
 # shell.py
 
 `py-nix-shell` provides an interface for quickly building new Nix
-shells using Python syntax via the `py-nix-shell` CLI utility.
+shells using Python syntax via the `pynix` CLI utility.
 
 Usage is simple; using the same
 [builders](https://chadac.github.io/py-nix-shell/builders.md)
 specified above, if you export it as a global variable named `shell`
-you can use it with `py-nix-shell`:
+you can use it with `pynix`:
 
 ```python
 import nix_shell
@@ -19,13 +19,13 @@ Shells can be activated similar to the `nix` syntax:
 
 ```bash
 # activates the `shell.py` in the given directory
-py-nix-shell
+pynix
 
 # activates an alternative `shell.py`
-py-nix-shell activate alternate_shell.py
+pynix activate -f alternate_shell.py
 
 # prints the dev environment for a given shell, useful for direnv
-py-nix-shell print-dev-env
+pynix print-dev-env
 ```
 
 ## Shell management

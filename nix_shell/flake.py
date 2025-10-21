@@ -81,7 +81,7 @@ def fetch_locked_from_flake_ref(ref: FlakeRef) -> FlakeRefLock:
         tree_ref.pop("__final", None)
     else:
         tree_ref = ref
-    return tree_ref
+    return tree_ref  # type: ignore
 
 
 def get_locked_from_lockfile(
@@ -98,7 +98,7 @@ def get_locked_from_lockfile(
         lock = json.load(f)
     locked = dict(lock["nodes"][name]["locked"])
     locked.pop("__final", None)
-    return locked
+    return locked  # type: ignore
 
 
 def get_locked_from_py_nix_shell(name: str) -> FlakeRefLock:
@@ -111,4 +111,4 @@ def get_locked_from_impure_nixpkgs() -> FlakeRefLock:
     """
     locked = dict(cli.flake.metadata("nixpkgs")["locked"])
     locked.pop("__final", None)
-    return locked
+    return locked  # type: ignore

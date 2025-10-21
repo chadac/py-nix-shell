@@ -42,3 +42,7 @@ docs-serve:
 # deploy docs
 docs-deploy:
   mkdocs gh-deploy
+
+# update README CLI usage section with current pynix --help output
+update-readme-usage:
+  python3 scripts/update_readme_help.py

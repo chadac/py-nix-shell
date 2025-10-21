@@ -3,8 +3,6 @@ from __future__ import annotations
 import inspect
 from abc import ABC
 from dataclasses import dataclass, field
-from pathlib import Path
-from typing import Optional
 
 from nix_shell import dsl
 
@@ -12,7 +10,8 @@ from nix_shell import dsl
 class ModuleType(ABC):
     def _update_source_location(self):
         # Capture source location where this module was instantiated
-        self._source_location: str = "unknown"
+        # Used for debugging purposes
+        self._source_location: str | None = None
         frame = inspect.currentframe()
         assert frame is not None
         while (frame := frame.f_back) is not None:
@@ -27,10 +26,11 @@ class ModuleType(ABC):
 
     def _get_name(self) -> str:
         cls = type(self)
-        return f"{cls.__module__}.{cls.__qualname__} at {self._source_location}"
+        return f"{cls.__module__}.{cls.__qualname__} at {self.source_location}"
 
-    def get_source_location(self) -> str:
-        """Get the file and line number where this module was created."""
+    @property
+    def source_location(self) -> str:
+        """The file and line number where this module was created."""
         return self._source_location or "unknown:0"
 
     @property

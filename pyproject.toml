@@ -28,7 +28,7 @@ dev = [
 "flake.lock" = "nix_shell/flake.lock"
 
 [tool.mypy]
-modules = ["nix_shell", "tests"]
+packages = ["nix_shell", "tests"]
 
 # [tool.pytest.ini_options]
 # log_cli = true

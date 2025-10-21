@@ -15,8 +15,10 @@ nav:
       - constants: api/constants.md
       - exceptions: api/exceptions.md
       - flake: api/flake.md
-      - nixlang: api/expr.md
-      - _nix: api/cli.md
+      - cli: api/cli.md
+      - dsl: api/dsl.md
+      - module: api/module.md
+      - devenv: api/devenv.md
 site_name: py-nix-shell
 theme:
   name: material

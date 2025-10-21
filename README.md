@@ -51,8 +51,8 @@ shell.persist_venv()
 Shells can be activated via the cli utility:
 
 ```bash
-py-nix-shell activate # activate the given shell
-py-nix-shell print-den-env # useful for direnv-type activations
+pynix activate # activate the given shell
+pynix print-dev-env # useful for direnv-type activations
 ```
 
 You can create Nix shells using a variety of [builders](https://chadac.github.io/py-nix-shell/builders):
@@ -120,21 +120,52 @@ def cli():
 
 ## CLI usage
 
+<!-- CLI_HELP_START -->
 ```
-$ py-nix-shell --help
-py-nix-shell manages Nix shell environments on your behalf. https://github.com/chadac/py-nix-shell
+$ pynix --help
+py-nix-shell - Nix shell environment manager
 
-Usage: py-nix-shell [OPTIONS] [COMMAND]
+USAGE:
+  pynix [COMMAND] [OPTIONS]
 
-Commands:
-  activate       Initializes a new Nix shell in the given shell session from a `shell.py`
-  print-dev-env  Prints the bash instructions needed to activate a dev env.
+COMMANDS:
+  Environment Management:
+    env        (default) Print shell activation script
+    activate   Spawn interactive shell with environment loaded
 
-Options:
-  -c, --command <EXPR>
-      Evaluates a given Python expression to build the Nix shell.
-  --command-from-stdin
-      Evaluates a given Python expression from stdin and activates the environment.
-  -f <FILE>
-      Evaluates a file besides `shell.py` to build the Nix shell.
+  Nix aliases:
+    shell      Run 'nix shell' directly
+    develop    Run 'nix develop' directly
+    build      Run 'nix build' directly
+    print-dev-env  Print raw 'nix print-dev-env' output
+
+  Useful tools:
+    show       Display the Nix expression to be evaluated
+
+OPTIONS:
+  -h, --help              Show this help message
+  -c, --command EXPR      Evaluate Python expression to build shell
+  --command-from-stdin    Read expression from stdin
+  -f FILE                 Use custom shell file (default: shell.py)
+  -v, --verbose           Increase verbosity (-v=INFO, -vv=DEBUG, -vvv=TRACE)
+
+EXAMPLES:
+  # Use default shell.py and get activation script
+  pynix
+
+  # Spawn interactive shell
+  pynix activate
+
+  # Quick shell with packages
+  pynix shell -c "mk_shell(packages=['curl', 'jq'])"
+
+  # Use custom shell file
+  pynix activate -f my_shell.py
+
+  # Activate in your shell
+  eval "$(pynix env)"
+
+For more info: https://github.com/chadac/py-nix-shell
+
 ```
+<!-- CLI_HELP_END -->

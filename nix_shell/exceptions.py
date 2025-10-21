@@ -22,7 +22,7 @@ class NixError(Exception):
     """
 
     def __init__(
-        self, exception: SubprocessError, params: dict, command: list[str] = None
+        self, exception: SubprocessError, params: dict, command: list[str] | None = None
     ):
         import logging
 

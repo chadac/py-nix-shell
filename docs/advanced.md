@@ -68,27 +68,3 @@ passing the following:
   a different name, you can use
   `flake_lock_name="alternative_nixpkgs"` to specify.
 
-## File sets
-
-Because Nix doesn't really provide a means of purely managing many Nix
-files beyond version tracking like Git, `py-nix-shell` does provide a
-layer to supplement this functionality:
-
-```python
-shell = nix_shell.from_fileset(
-  main="shell.nix",
-  files=Path.cwd().glob("**.nix")
-)
-```
-
-This is useful when you might have dev shells inside a Nix package
-that do not necessarily need the entire Git repository to update the
-shell. This can save on load times, especially since many shells do
-not necessarily depend on the full contents of a repository.
-
-```
-{ pkgs }:
-let
-  myPackage = pkgs.callPackage ./my-package.nix {};
-in pkgs.mkShell { packages = [ myPackage ]; }
-```

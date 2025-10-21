@@ -72,7 +72,7 @@ class ColoredHelpFormatter(argparse.HelpFormatter):
         help_text = f"""{Colors.BOLD}{Colors.BLUE}py-nix-shell{Colors.END} - {Colors.DIM}Nix shell environment manager{Colors.END}
 
 {Colors.BOLD}USAGE:{Colors.END}
-  {Colors.GREEN}py-nix-shell{Colors.END} {Colors.CYAN}[COMMAND]{Colors.END} {Colors.DIM}[OPTIONS]{Colors.END}
+  {Colors.GREEN}pynix{Colors.END} {Colors.CYAN}[COMMAND]{Colors.END} {Colors.DIM}[OPTIONS]{Colors.END}
 
 {Colors.BOLD}COMMANDS:{Colors.END}
   {Colors.BOLD}Environment Management:{Colors.END}
@@ -84,7 +84,9 @@ class ColoredHelpFormatter(argparse.HelpFormatter):
     {Colors.GREEN}develop{Colors.END}    Run 'nix develop' directly
     {Colors.GREEN}build{Colors.END}      Run 'nix build' directly
     {Colors.GREEN}print-dev-env{Colors.END}  Print raw 'nix print-dev-env' output
-    {Colors.GREEN}show{Colors.END}       Display the Nix expression being evaluated
+
+  {Colors.BOLD}Useful tools:{Colors.END}
+    {Colors.GREEN}show{Colors.END}       Display the Nix expression to be evaluated
 
 {Colors.BOLD}OPTIONS:{Colors.END}
   {Colors.CYAN}-h, --help{Colors.END}              Show this help message
@@ -95,19 +97,19 @@ class ColoredHelpFormatter(argparse.HelpFormatter):
 
 {Colors.BOLD}EXAMPLES:{Colors.END}
   {Colors.DIM}# Use default shell.py and get activation script{Colors.END}
-  {Colors.GREEN}py-nix-shell{Colors.END}
+  {Colors.GREEN}pynix{Colors.END}
 
   {Colors.DIM}# Spawn interactive shell{Colors.END}
-  {Colors.GREEN}py-nix-shell activate{Colors.END}
+  {Colors.GREEN}pynix activate{Colors.END}
 
   {Colors.DIM}# Quick shell with packages{Colors.END}
-  {Colors.GREEN}py-nix-shell{Colors.END} {Colors.CYAN}-c{Colors.END} {Colors.YELLOW}"mk_shell(packages=['curl', 'jq'])"{Colors.END}
+  {Colors.GREEN}pynix shell{Colors.END} {Colors.CYAN}-c{Colors.END} {Colors.YELLOW}"mk_shell(packages=['curl', 'jq'])"{Colors.END}
 
   {Colors.DIM}# Use custom shell file{Colors.END}
-  {Colors.GREEN}py-nix-shell activate{Colors.END} {Colors.CYAN}-f{Colors.END} {Colors.YELLOW}my_shell.py{Colors.END}
+  {Colors.GREEN}pynix activate{Colors.END} {Colors.CYAN}-f{Colors.END} {Colors.YELLOW}my_shell.py{Colors.END}
 
   {Colors.DIM}# Activate in your shell{Colors.END}
-  {Colors.GREEN}eval "$(py-nix-shell env)"{Colors.END}
+  {Colors.GREEN}eval "$(pynix env)"{Colors.END}
 
 {Colors.DIM}For more info: https://github.com/chadac/py-nix-shell{Colors.END}
 """

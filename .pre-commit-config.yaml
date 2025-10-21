@@ -6,22 +6,28 @@ repos:
       entry: 'just ruff-check-fix'
       language: system
       stages: [pre-commit]
-      files: '(nix_shell|tests)/.*'
+      files: '(nix_shell|tests)/.*\.py'
     - id: mypy
       name: mypy
       entry: 'just mypy'
       language: system
       stages: [pre-commit]
-      files: '(nix_shell|tests)/.*'
+      files: '(nix_shell|tests)/.*\.py'
     - id: format
       name: format
       entry: 'just format'
       language: system
-      files: '(nix_shell|tests)/.*'
+      files: '(nix_shell|tests)/.*\.py'
       stages: [pre-commit]
     - id: check-docs
       name: ensure docs are up-to-date
       entry: 'just docs-build'
+      language: system
+      pass_filenames: false
+      stages: [pre-commit]
+    - id: check-readme-usage
+      name: ensure readme usage is up-to-date
+      entry: 'just update-readme-usage'
       language: system
       pass_filenames: false
       stages: [pre-commit]
