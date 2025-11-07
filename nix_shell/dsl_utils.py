@@ -1,15 +1,64 @@
+"""DSL utilities for working with Nix expressions."""
+
+from dataclasses import dataclass
+from pathlib import Path
 from nix_shell import cli, dsl
 from nix_shell.flake import FlakeRefLock
+from nix_shell.nix_context import NixContext
+from nix_shell.utils import find_shared_root
 
 
 def import_flake(locked: FlakeRefLock) -> dsl.NixExpr:
-    return dsl.call(dsl.builtins["fetchTree"], dsl.attrs(**locked))
+    """Import a flake from its locked reference."""
+    return (dsl.builtins["fetchTree"], locked)
 
 
 def import_nixpkgs(locked: FlakeRefLock, system: str | None = None) -> dsl.NixExpr:
+    """Import nixpkgs from its locked reference for the given system."""
     nix_system = system or cli.current_system()
     return dsl.let(
-        tree=dsl.call(dsl.builtins["fetchTree"], dsl.attrs(**locked)),
-        nixpkgs=dsl.NixVar("tree")["outPath"],
-        in_=dsl.call("import", dsl.NixVar("nixpkgs"), dsl.attrs(system=nix_system)),
+        tree=(dsl.builtins["fetchTree"], locked),
+        nixpkgs=dsl.v("tree")["outPath"],
+        in_=(dsl.raw("import"), dsl.v("nixpkgs"), {"system": nix_system}),
     )
+
+
+@dataclass
+class FileSet:
+    """A set of files that can be built into a Nix store path."""
+
+    paths: dict[Path, dsl.StorePath]
+
+    @classmethod
+    def union(cls, paths: list[Path]):
+        """Create a FileSet from a list of file paths with a common root."""
+        root = find_shared_root(paths)
+        result = {}
+        for src_path in paths:
+            dest_path = src_path.relative_to(root)
+            result[dest_path] = dsl.StorePath.from_path(src_path)
+        return cls(result)
+
+    @classmethod
+    def virtual(cls, paths: dict[Path | str, str]):
+        """Create a FileSet from virtual files with specified content."""
+        result = {}
+        for dest_path, content in paths.items():
+            result[Path(dest_path)] = dsl.StorePath.from_string(content)
+        return cls(result)
+
+    def mk_expr(self, ctx: NixContext) -> dsl.NixExpr:
+        """Generate a Nix expression that creates a directory with these files."""
+        cmds = []
+        mk_dirs = set([])
+        for dest_path, nix_file in self.paths.items():
+            parent = dest_path.parent
+
+            # if the parent dir doesn't exist yet, make it
+            if parent != dest_path and parent not in mk_dirs:
+                cmds += [f"mkdir -p $out/{parent}"]
+                mk_dirs.add(parent)
+
+            cmds += [f"ln -s {ctx[nix_file]} $out/{dest_path}"]
+
+        return ctx["pkgs"]["runCommand"]("src", {}, "\n".join(cmds))

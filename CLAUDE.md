@@ -34,3 +34,5 @@ Recent changes:
 5. Fix any issues found by the above commands
 
 This ensures consistent code style and catches issues early.
+
+**Important**: Always run `just check` after making any code changes to ensure consistent formatting and linting.

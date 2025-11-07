@@ -1,12 +1,23 @@
 {
   python3,
   lib,
-
-  version ? "0.0.1",
 }: let
+  pyprojectToml = builtins.fromTOML (builtins.readFile ./pyproject.toml);
 in python3.pkgs.buildPythonPackage {
-  name = "py-nix-shell";
-  inherit version;
+  inherit (pyprojectToml.project) name version;
+  src = lib.fileset.toSource {
+    root = ./.;
+    fileset = lib.fileset.unions [
+      ./flake.lock
+      ./pyproject.toml
+      ./README.md
 
-  src = lib.cleanSource ./.;
+      ./nix_shell
+    ];
+  };
+
+  format = "pyproject";
+
+  build-system = with python3.pkgs; [ hatchling ];
+
 }

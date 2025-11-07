@@ -1,59 +1,67 @@
 """Nix expression builder and utilities."""
 
 from .core import (
-    NixCompoundType,
+    NixComplexType,
     NixExpr,
     NixExprType,
     dumps,
 )
-from .filesystem import FileSet, StorePath
-from .lang import (
+from .complex import (
     Attrs,
-    Call,
     Function,
     Let,
     NixVar,
     Param,
+    ParamWithDefault,
     Raw,
     With,
     attrs,
-    builtins,
     call,
     dots,
     func,
     let,
+    param,
     raw,
     v,
     var,
-    with_,
+    w,
+)
+from .filesystem import StorePath
+from .variables import (
+    pkgs,
+    lib,
+    builtins,
 )
 
 __all__ = [
     # Core types and functions
-    "NixCompoundType",
+    "NixComplexType",
     "NixExpr",
     "NixExprType",
     "NixVar",
     "dumps",
     # Filesystem utilities
-    "FileSet",
     "StorePath",
     # Language constructs
-    "Call",
     "Let",
     "Raw",
     "With",
     "Attrs",
     "Function",
     "Param",
+    "ParamWithDefault",
     "attrs",
     "call",
     "let",
+    "param",
     "raw",
-    "with_",
+    "w",
     "dots",
     "func",
-    "builtins",
     "var",
     "v",
+    # common variables
+    "pkgs",
+    "lib",
+    "builtins",
 ]

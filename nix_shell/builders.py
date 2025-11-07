@@ -75,12 +75,6 @@ class MkShellParams(NixpkgsParams):
     system: NotRequired[str]
 
 
-def _with_pkgs(pkgs: list[str | dsl.NixExpr]) -> dsl.NixExpr:
-    return dsl.with_(
-        "pkgs", [dsl.raw(pkg) if isinstance(pkg, str) else pkg for pkg in pkgs]
-    )
-
-
 def from_flake(**kwargs: Unpack[FlakeRefParams]) -> NixShell:
     """Create a Nix shell from a flake."""
     return NixShell.create(ref=kwargs["flake"])
@@ -121,8 +115,9 @@ def from_nix(**kwargs: Unpack[MkNixParams]) -> NixShell:
 
 
 @dataclass
-class NixShellBuilder(dsl.NixCompoundType):
-    nixpkgs_locked: FlakeRefLock
+class NixShellBuilder(dsl.NixComplexType):
+    """Builder for creating mkShell Nix expressions with package dependencies and configuration."""
+
     packages: list[str | dsl.NixExpr] = field(default_factory=list)
     inputs_from: list[str | dsl.NixExpr] = field(default_factory=list)
     build_inputs: list[str | dsl.NixExpr] = field(default_factory=list)
@@ -132,15 +127,19 @@ class NixShellBuilder(dsl.NixCompoundType):
     system: str = field(default_factory=cli.current_system)
 
     def add_package(self, pkg: str | dsl.NixExpr) -> None:
+        """Add a package to the shell environment."""
         self.packages.append(pkg)
 
     def add_input(self, pkg: str | dsl.NixExpr) -> None:
+        """Add a package to inputsFrom for the shell."""
         self.inputs_from.append(pkg)
 
     def add_build_input(self, pkg: str | dsl.NixExpr) -> None:
+        """Add a package to buildInputs for the shell."""
         self.build_inputs.append(pkg)
 
     def _nix_library_path(self) -> str | None:
+        """Generate the LD_LIBRARY_PATH for the shell from library_path packages."""
         if self.library_path:
             return f"${{pkgs.lib.makeLibraryPath ({dsl.dumps(_with_pkgs(list(self.library_path)))})}}"
         else:
@@ -148,6 +147,7 @@ class NixShellBuilder(dsl.NixCompoundType):
 
     @property
     def _expr(self) -> dsl.NixExpr:
+        """Generate the mkShell Nix expression for this builder."""
         shell_hook = list(self.shell_hook)
         if library_path := self._nix_library_path():
             shell_hook.append(
@@ -169,6 +169,7 @@ class NixShellBuilder(dsl.NixCompoundType):
         )
 
     def dumps(self) -> str:
+        """Serialize the shell builder to a Nix expression string."""
         return dsl.dumps(self._expr)
 
 
@@ -188,6 +189,17 @@ def mk_shell_expr(
         system=kwargs.get("system", cli.current_system()),
     )
     return dsl.dumps(shell)
+
+
+def _with_pkgs(packages: list[str | dsl.NixExpr]) -> dsl.NixExpr:
+    """Convert a list of package names/expressions to a Nix list with pkgs prefix."""
+    nix_packages = []
+    for pkg in packages:
+        if isinstance(pkg, str):
+            nix_packages.append(dsl.call(f"pkgs.{pkg}"))
+        else:
+            nix_packages.append(pkg)
+    return dsl.list(*nix_packages)
 
 
 def mk_shell(**kwargs: Unpack[MkShellParams]) -> NixShell:

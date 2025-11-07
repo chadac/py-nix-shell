@@ -11,8 +11,6 @@ from nix_shell import cli
 from nix_shell.constants import PKG_FLAKE_LOCK
 from nix_shell.dsl import NixExpr
 
-FlakeRef = str | dict[str, NixExpr]
-
 
 class FlakeRefLock(TypedDict):
     """
@@ -51,20 +49,29 @@ class FlakeRefLock(TypedDict):
     host: NotRequired[str]  # Custom host for git forges
 
 
+FlakeRef = str | Path | FlakeRefLock
+
+
 @dataclass
 class FlakeInputFollows:
+    """Represents a flake input with follows relationships."""
+
     follows: str | None = None
     inputs: dict[str, FlakeInputFollows] = field(default_factory=dict)
 
 
 @dataclass
 class FlakeInput:
+    """Represents a flake input with URL and nested input relationships."""
+
     url: str
     inputs: dict[str, FlakeInputFollows]
 
 
 @dataclass
 class Flake:
+    """Represents a complete flake with inputs and output expression."""
+
     inputs: dict[str, FlakeInput]
     output: NixExpr
 
@@ -79,6 +86,8 @@ def fetch_locked_from_flake_ref(ref: FlakeRef) -> FlakeRefLock:
     if isinstance(ref, str):
         tree_ref = dict(cli.flake.metadata(ref)["locked"])
         tree_ref.pop("__final", None)
+    elif isinstance(ref, Path):
+        return fetch_locked_from_flake_ref(f"path:{str(ref.absolute())}")
     else:
         tree_ref = ref
     return tree_ref  # type: ignore
@@ -102,6 +111,7 @@ def get_locked_from_lockfile(
 
 
 def get_locked_from_py_nix_shell(name: str) -> FlakeRefLock:
+    """Get a locked reference from the py-nix-shell flake.lock file."""
     return get_locked_from_lockfile(PKG_FLAKE_LOCK, name)
 
 

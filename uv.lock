@@ -1,5 +1,5 @@
 version = 1
-revision = 2
+revision = 3
 requires-python = ">=3.10"
 
 [[package]]
@@ -449,7 +449,7 @@ wheels = [
 
 [[package]]
 name = "nix-shell"
-version = "0.0.0"
+version = "0.0.3"
 source = { editable = "." }
 
 [package.dev-dependencies]

@@ -4,6 +4,7 @@
 import argparse
 import logging
 import os
+import runpy
 import sys
 import tempfile
 from pathlib import Path
@@ -12,6 +13,9 @@ from typing import Any
 import nix_shell
 from nix_shell.build import NixShell
 from nix_shell.exceptions import NixError
+
+
+logger = logging.getLogger("pynix")
 
 
 class Colors:
@@ -47,20 +51,17 @@ class ColoredLogFormatter(logging.Formatter):
     }
 
     def format(self, record):
+        """Format a log record with appropriate colors based on log level."""
         # Make a copy to avoid modifying the original record
         record_copy = logging.makeLogRecord(record.__dict__)
+
+        record_copy.levelname = record_copy.levelname.lower()
 
         if Colors._use_colors:
             level_color = self.LEVEL_COLORS.get(record_copy.levelno, "")
             record_copy.levelname = (
                 f"{level_color}{record_copy.levelname:5s}{Colors.END}"
             )
-
-            # Color the message based on level
-            if record_copy.levelno >= logging.ERROR:
-                record_copy.msg = f"{Colors.RED}{record_copy.msg}{Colors.END}"
-            elif record_copy.levelno >= logging.WARNING:
-                record_copy.msg = f"{Colors.YELLOW}{record_copy.msg}{Colors.END}"
 
         return super().format(record_copy)
 
@@ -69,23 +70,24 @@ class ColoredHelpFormatter(argparse.HelpFormatter):
     """Custom help formatter with colors and better organization."""
 
     def format_help(self):
-        help_text = f"""{Colors.BOLD}{Colors.BLUE}py-nix-shell{Colors.END} - {Colors.DIM}Nix shell environment manager{Colors.END}
+        """Format the help message with colors and improved organization."""
+        help_text = f"""{Colors.BOLD}{Colors.BLUE}pynix{Colors.END} - {Colors.DIM}Nix shell environment manager{Colors.END}
 
 {Colors.BOLD}USAGE:{Colors.END}
   {Colors.GREEN}pynix{Colors.END} {Colors.CYAN}[COMMAND]{Colors.END} {Colors.DIM}[OPTIONS]{Colors.END}
 
 {Colors.BOLD}COMMANDS:{Colors.END}
-  {Colors.BOLD}Environment Management:{Colors.END}
-    {Colors.GREEN}env{Colors.END}        {Colors.DIM}(default){Colors.END} Print shell activation script
+  {Colors.BOLD}environment management:{Colors.END}
+    {Colors.GREEN}env{Colors.END}        Print shell activation script
     {Colors.GREEN}activate{Colors.END}   Spawn interactive shell with environment loaded
 
-  {Colors.BOLD}Nix aliases:{Colors.END}
+  {Colors.BOLD}nix aliases:{Colors.END}
     {Colors.GREEN}shell{Colors.END}      Run 'nix shell' directly
     {Colors.GREEN}develop{Colors.END}    Run 'nix develop' directly
     {Colors.GREEN}build{Colors.END}      Run 'nix build' directly
     {Colors.GREEN}print-dev-env{Colors.END}  Print raw 'nix print-dev-env' output
 
-  {Colors.BOLD}Useful tools:{Colors.END}
+  {Colors.BOLD}useful tools:{Colors.END}
     {Colors.GREEN}show{Colors.END}       Display the Nix expression to be evaluated
 
 {Colors.BOLD}OPTIONS:{Colors.END}
@@ -118,7 +120,7 @@ class ColoredHelpFormatter(argparse.HelpFormatter):
 
 def setup_logging(level: int = logging.INFO) -> logging.Logger:
     """Set up colored logging for py-nix-shell."""
-    logger = logging.getLogger("py-nix-shell")
+    global logger
 
     if logger.handlers:
         return logger  # Already configured
@@ -138,22 +140,23 @@ def setup_logging(level: int = logging.INFO) -> logging.Logger:
 
 
 def get_default_namespace() -> dict[str, Any]:
+    """Get the default namespace with all public nix_shell attributes."""
     return {k: v for k, v in nix_shell.__dict__.items() if not k.startswith("_")}
 
 
 def load_shell_from_file(file_path: Path) -> NixShell:
     """Load a shell from a Python file by executing it and extracting the 'shell' variable."""
     if not file_path.exists():
-        raise FileNotFoundError(f"Shell file not found: {file_path}")
+        raise FileNotFoundError(f"shell file not found: {file_path}")
 
     # Execute the Python file and extract the shell variable
     namespace: dict[str, Any] = get_default_namespace()
-    exec(file_path.read_text(), namespace)
+    result = runpy.run_path(str(file_path), init_globals=namespace)
 
-    if "shell" not in namespace:
-        raise ValueError(f"No 'shell' variable found in {file_path}")
+    if "shell" not in result:
+        raise ValueError(f"no 'shell' variable found in {file_path}")
 
-    shell = namespace["shell"]
+    shell = result["shell"]
     if not isinstance(shell, NixShell):
         raise ValueError(f"'shell' variable in {file_path} is not a NixShell instance")
 
@@ -232,8 +235,6 @@ def cmd_shell(shell: NixShell) -> None:
     """Run 'nix shell' with the shell's parameters."""
     from nix_shell import cli
 
-    logger = logging.getLogger("py-nix-shell")
-
     try:
         cli.shell(**shell.params)
     except KeyboardInterrupt:
@@ -247,8 +248,6 @@ def cmd_develop(shell: NixShell) -> None:
     """Run 'nix develop' with the shell's parameters."""
     from nix_shell import cli
 
-    logger = logging.getLogger("py-nix-shell")
-
     try:
         cli.develop(**shell.params)
     except KeyboardInterrupt:
@@ -261,8 +260,6 @@ def cmd_develop(shell: NixShell) -> None:
 def cmd_build(shell: NixShell) -> None:
     """Run 'nix build' with the shell's parameters."""
     from nix_shell import cli
-
-    logger = logging.getLogger("py-nix-shell")
 
     try:
         result = cli.build(**shell.params)
@@ -289,7 +286,6 @@ def cmd_show(shell: NixShell) -> None:
         print(format_nix(shell.params["expr"]))
     else:
         # For file-based or flake-based shells, we need to show what would be built
-        logger = logging.getLogger("py-nix-shell")
         if "ref" in shell.params:
             print(f"# Flake reference: {shell.params['ref']}")
         elif "file" in shell.params:
@@ -307,7 +303,7 @@ def main():
 
     parser = argparse.ArgumentParser(
         prog="pynix",
-        description="py-nix-shell manages Nix shell environments on your behalf. https://github.com/chadac/py-nix-shell",
+        description="pynix manages Nix shell environments on your behalf. https://github.com/chadac/py-nix-shell",
         formatter_class=ColoredHelpFormatter,
         add_help=False,  # We'll handle help manually
     )
@@ -315,7 +311,6 @@ def main():
     parser.add_argument(
         "command",
         nargs="?",
-        default="env",
         choices=[
             "activate",
             "env",
@@ -379,7 +374,7 @@ def main():
     logger = setup_logging(log_level)
 
     # Handle help manually to use our custom formatter
-    if args.help:
+    if args.help or args.command is None:
         formatter = ColoredHelpFormatter(prog="pynix")
         print(formatter.format_help())
         sys.exit(0)
@@ -387,19 +382,19 @@ def main():
     try:
         # Determine shell source
         if args.expression:
-            logger.info(f"Using expression: {args.expression}")
+            logger.info(f"using expression: {args.expression}")
             shell = load_shell_from_expression(args.expression)
         elif args.command_from_stdin:
-            logger.info("Reading expression from stdin")
+            logger.info("reading expression from stdin")
             expression = sys.stdin.read().strip()
             shell = load_shell_from_expression(expression)
         elif args.file:
-            logger.info(f"Using shell file: {args.file}")
+            logger.info(f"using shell file: {args.file}")
             shell = load_shell_from_file(args.file)
         else:
             # Default to shell.py in current directory
             shell_file = Path("shell.py")
-            logger.info(f"Using default shell file: {shell_file}")
+            logger.info(f"using default shell file: {shell_file}")
             shell = load_shell_from_file(shell_file)
 
         # Execute the requested command
@@ -419,20 +414,16 @@ def main():
         elif args.command == "show":
             cmd_show(shell)
         else:
-            parser.error(f"Unknown command: {args.command}")
+            parser.error(f"unknown command: {args.command}")
     except FileNotFoundError as e:
         logger.error(str(e))
-        sys.exit(1)
     except ValueError as e:
         logger.error(str(e))
-        sys.exit(1)
     except NixError as e:
         logger.error(str(e))
-        # Debug info is already logged by NixError.__init__
-        sys.exit(1)
     except Exception as e:
-        logger.error(f"Unexpected error: {e}")
-        sys.exit(1)
+        logger.error(f"unexpected error: {e}")
+        raise
 
 
 if __name__ == "__main__":

@@ -8,10 +8,15 @@ import sys
 from dataclasses import dataclass, field
 from functools import cached_property, lru_cache
 from pathlib import Path
-from typing import Any, Callable, Self, TypeVar, Unpack
+from typing import TYPE_CHECKING, Any, Callable, Self, TypeVar, Unpack
 
-from nix_shell import cli
+if TYPE_CHECKING:
+    from nix_shell.cache import CacheHistoryEntry
+
+from nix_shell import cli, dsl
 from nix_shell.constants import LOCAL_CACHE_ROOT
+from nix_shell.flake import FlakeRef, FlakeRefLock, fetch_locked_from_flake_ref
+from nix_shell.nix_context import NixContext, get_nix_context
 
 T = TypeVar("T", bound="NixBuild")
 
@@ -45,6 +50,59 @@ class NixBuild:
         speedup when invoking multiple commands with the same Nix build.
         """
         return cls(params)
+
+    @classmethod
+    def from_expr(cls: type[T], expr: dsl.NixExpr) -> T:
+        """Create a NixBuild from a Nix expression."""
+        return cls.create(expr=dsl.dumps(expr))
+
+    @classmethod
+    def from_expr_with_context(
+        cls: type[T], expr: dsl.NixExpr, ctx: NixContext | None = None
+    ) -> T:
+        """Create a NixBuild from a Nix expression wrapped in a context."""
+        ctx = ctx or get_nix_context()
+        return cls.create(
+            expr=dsl.dumps(ctx.wrap(expr)),
+            **ctx.build_args,
+        )
+
+    @classmethod
+    def from_flake(
+        cls: type[T],
+        ref: FlakeRef | None = None,
+        locked: FlakeRefLock | None = None,
+        output: str = "default",
+    ) -> T:
+        """Create a NixBuild from a flake reference."""
+        assert ref is not None or locked is not None, (
+            "either a flake reference or lock must be passed"
+        )
+        if locked is None:
+            assert ref is not None
+            locked = fetch_locked_from_flake_ref(ref)
+        return cls.create(
+            expr=dsl.dumps(
+                dsl.let(
+                    flake=dsl.builtins["getFlake"](locked), in_=dsl.v("flake")[output]
+                )
+            )
+        )
+
+    @classmethod
+    def from_cache(cls: type[T], entry: "CacheHistoryEntry") -> T:
+        """Create a phantom NixBuild from a cache entry."""
+        from pathlib import Path
+
+        # Create minimal NixBuild with empty params
+        instance = cls({})
+
+        # Load the cached data from the JSON file
+        json_path = Path(entry["json_path"])
+        if json_path.exists():
+            instance.load(json_path)
+
+        return instance
 
     @cached_property
     def build_id(self) -> str:
@@ -124,6 +182,16 @@ class NixBuild:
         """Create a symlink to the derivation at the given location."""
         cli.build(out_link=dest, **self.params)
 
+    def load(self, json_path: Path) -> None:
+        """Load cached build data from a JSON file into this instance."""
+        with json_path.open("r") as f:
+            data = json.load(f)
+
+        # Populate the build object with cached data
+        for key, value in data.items():
+            if key in self._venv_keys:
+                self.__dict__[key] = value
+
 
 LIST_LIKE_VARS = {
     "PATH",
@@ -148,6 +216,7 @@ class NixShell(NixBuild):
     """
 
     def __post_init__(self):
+        """Initialize NixShell with additional cache keys."""
         self._venv_keys.add("env")
 
     @property
@@ -156,11 +225,13 @@ class NixShell(NixBuild):
         return self.derivation["env"]["out"]
 
     def _load(self, data: dict[str, Any]) -> None:
+        """Load cached build data into this instance."""
         # populate cache
         for key, value in data.items():
             self.__dict__[key] = value
 
     def _save(self, json_root: Path, profile_root: Path) -> None:
+        """Save build data to cache files."""
         LOCAL_CACHE_ROOT.mkdir(parents=True, exist_ok=True)
         # first evaluate everything
         for key in self._venv_keys:

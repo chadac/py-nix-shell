@@ -27,6 +27,7 @@ class NixBuildArgs(TypedDict):
         expr (str): Nix expression to build.
         impure (bool): Whether to run nix in impure evaluation mode. Defaults to `False`.
         include (tuple[tuple[str, str]]): Equivalent to `--include`.
+        arg_from_file (dict[str, Path]): Equivalent to `--arg-from-file`.
     """
 
     file: NotRequired[Path | str]
@@ -35,11 +36,13 @@ class NixBuildArgs(TypedDict):
     expr: NotRequired[str]
     impure: NotRequired[bool]
     include: NotRequired[tuple[tuple[str, str], ...]]
+    arg_from_file: NotRequired[dict[str, Path]]
 
 
 def _parse_args(
     **params: Unpack[NixBuildArgs],
 ) -> list[str]:
+    """Parse NixBuildArgs into command-line arguments for nix commands."""
     args = []
     if "ref" in params:
         args += [params["ref"]]
@@ -51,6 +54,9 @@ def _parse_args(
             args += [params["installable"]]
     if params.get("impure", False):
         args += ["--impure"]
+    if files := params.get("arg_from_file"):
+        for arg_name, path in files.items():
+            args += ["--arg-from-file", arg_name, str(path)]
     for key, value in params.get("include", []):
         args += ["-I", f"{key}={value}"]
     return args
@@ -62,6 +68,7 @@ def _cmd(
     extra_args: list[str] = [],
     **params: Unpack[NixBuildArgs],
 ) -> str:
+    """Execute a nix command with the given parameters and return its output."""
     import logging
 
     args = _parse_args(**params) + extra_args
@@ -122,6 +129,7 @@ def build(
 
 
 def print_dev_env(**params: Unpack[NixBuildArgs]):
+    """Run `nix print-dev-env` to get shell environment setup commands."""
     return _cmd("print-dev-env", **params)
 
 
@@ -146,6 +154,7 @@ def _shell_cmd(
     extra_args: list[str] = [],
     **params: Unpack[NixBuildArgs],
 ):
+    """Execute an interactive nix shell command with the given parameters."""
     args = _parse_args(**params) + extra_args
     if isinstance(cmd, str):
         cmds = [cmd]
@@ -159,10 +168,12 @@ def _shell_cmd(
 
 
 def develop(**params: Unpack[NixBuildArgs]):
+    """Run `nix develop` to enter a development shell."""
     return _shell_cmd(**params)
 
 
 def shell(**params: Unpack[NixBuildArgs]):
+    """Run `nix shell` to create a shell environment with packages."""
     return _shell_cmd(cmd="shell", **params)
 
 
@@ -187,6 +198,8 @@ def impure_nixpkgs_path() -> str:
 
 
 class derivation:
+    """Nix derivation commands."""
+
     @staticmethod
     def show(**params: Unpack[NixBuildArgs]):
         """Run `nix derivation show`"""
@@ -194,6 +207,8 @@ class derivation:
 
 
 class flake:
+    """Nix flake commands."""
+
     @staticmethod
     @wrap_subprocess_error
     def metadata(flake_ref: str) -> dict:
@@ -206,9 +221,12 @@ class flake:
 
 
 class store:
+    """Nix store commands."""
+
     @staticmethod
     @wrap_subprocess_error
     def add(path: Path) -> str:
+        """Add a path to the nix store and return its store path."""
         return subprocess.check_output(
             ["nix", "store", "add", str(path.absolute())]
         ).decode()

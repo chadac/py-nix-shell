@@ -44,6 +44,7 @@ def find_shared_root(paths: list[Path]) -> Path:
 
 
 def format_nix(expr: str, raise_if_missing: bool = False) -> str:
+    """Format a Nix expression using nixfmt if available."""
     if shutil.which("nixfmt"):
         return subprocess.check_output(["nixfmt"], input=expr.encode()).decode()
     elif not raise_if_missing:

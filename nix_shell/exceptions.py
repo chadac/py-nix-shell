@@ -11,6 +11,7 @@ class NeedsNix(Exception):
     """
 
     def __init__(self):
+        """Initialize NeedsNix with a helpful error message."""
         super().__init__(
             "Nix is not installed. Follow the instructions at https://nixos.org/download/ to install Nix."
         )
@@ -24,6 +25,7 @@ class NixError(Exception):
     def __init__(
         self, exception: SubprocessError, params: dict, command: list[str] | None = None
     ):
+        """Initialize NixError with detailed error information and logging."""
         import logging
 
         self.original_exception = exception

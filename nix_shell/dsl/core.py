@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import abc
 import textwrap
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Tuple
 
 if TYPE_CHECKING:
     pass
@@ -12,20 +12,25 @@ if TYPE_CHECKING:
 _indent = "  "
 
 
-class NixCompoundType(abc.ABC):
+class NixComplexType(abc.ABC):
     """
     A more complex Nix expression type.
     """
 
     def dumps(self) -> str:
+        """Serialize this complex type to a Nix expression string."""
         raise NotImplementedError()
 
 
-class NixExprType(NixCompoundType):
+class NixExprType(NixComplexType):
+    """Base class for complex types that can be converted to simple Nix expressions."""
+
     def expr(self) -> NixExpr:
+        """Convert this complex type to a simple Nix expression."""
         return NotImplemented
 
     def dumps(self) -> str:
+        """Serialize this expression type to a Nix expression string."""
         # Default implementation: call expr() and return as string if it's a string,
         # otherwise serialize it normally
         expr_result = self.expr()
@@ -42,7 +47,8 @@ NixExpr = (
     | float
     | dict[str, "NixExpr"]
     | list["NixExpr"]
-    | NixCompoundType
+    | Tuple
+    | NixComplexType
     | None
 )
 
@@ -64,7 +70,9 @@ def dumps(n: NixExpr) -> str:
             return _attrset(n)
         case list():
             return "[ " + " ".join([dumps(x) for x in n]) + " ]"
-        case NixCompoundType():
+        case tuple():
+            return "(" + " ".join([dumps(n[0])] + [dumps(arg) for arg in n[1:]]) + ")"
+        case NixComplexType():
             return n.dumps()
 
 

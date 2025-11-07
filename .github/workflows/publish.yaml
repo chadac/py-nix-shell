@@ -19,10 +19,14 @@ jobs:
           python-version: "3.13"
       - uses: DeterminateSystems/nix-installer-action@main
       - uses: astral-sh/setup-uv@v6
-      - name: Replace version
+      - name: Ensure version matches
         run: |
-          VERSION=${GITHUB_REF#refs/tags/v}
-          sed -i "s/^version = \"0.0.0\"/version = \"${VERSION}\"/g" pyproject.toml
+          GIT_VERSION=${GITHUB_REF#refs/tags/v}
+          FILE_VERSION=$(uv run -- python -c "import tomllib; print(tomllib.load(open('pyproject.toml', 'rb'))['project']['version'])")
+          if [ "$GIT_VERSION" != "$FILE_VERSION" ]; then
+            echo "error: git version does not match file version ('${GIT_VERSION}' != '${FILE_VERSION}')"
+            exit 1
+          fi
       - name: Test
         run: |
           uv run -- pytest
