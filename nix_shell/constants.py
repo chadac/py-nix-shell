@@ -4,8 +4,9 @@ import os
 import sys
 from pathlib import Path
 
-LOCAL_CACHE_ROOT = Path(sys.executable).parent.parent / "var" / "cache" / "nix-shell"
-"""Local cache directory relative to Python installation."""
+_DEFAULT_LOCAL_CACHE = Path.home() / ".cache" / "py-nix-shell" / "local"
+LOCAL_CACHE_ROOT = Path(os.environ.get("PY_NIX_SHELL_CACHE", str(_DEFAULT_LOCAL_CACHE)))
+"""Local cache directory for shells."""
 
 CACHE_ROOT = (
     Path(os.environ.get("XDG_CACHE_HOME", "~/.cache")).expanduser() / "py-nix-shell"

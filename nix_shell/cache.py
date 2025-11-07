@@ -1,12 +1,78 @@
 """Caching functionality for Nix builds and shells."""
 
+from __future__ import annotations
+
 import json
 import time
 from pathlib import Path
-from typing import TypedDict
+from typing import TYPE_CHECKING, TypedDict
 
-from nix_shell.build import NixBuild
+if TYPE_CHECKING:
+    from nix_shell.build import NixBuild
+
+from nix_shell.nix_context import NixContext, get_nix_context
+
 from nix_shell.constants import CACHE_ROOT, LOCAL_CACHE_ROOT
+
+
+class CacheOptions(TypedDict):
+    """Cache configuration options."""
+    
+    history: int
+    use_global: bool
+
+
+def use_cache(
+    *,
+    history: int = 10,
+    use_global: bool = False,
+    ctx: NixContext | None = None,
+) -> None:
+    """
+    Enable caching for a NixContext.
+    
+    Creates a cache_options.json file that tells pynix to use caching by default.
+    
+    Args:
+        history: Number of recent builds to keep in history
+        use_global: Whether to use CACHE_ROOT instead of LOCAL_CACHE_ROOT
+        ctx: NixContext to enable caching for (defaults to current global context)
+    """
+    ctx = ctx or get_nix_context()
+    
+    cache_options: CacheOptions = {
+        "history": history,
+        "use_global": use_global,
+    }
+    ctx.cache_options = cache_options
+    
+    # Write cache options to file for persistence
+    LOCAL_CACHE_ROOT.mkdir(parents=True, exist_ok=True)
+    cache_options_file = LOCAL_CACHE_ROOT / "cache_options.json"
+    with cache_options_file.open("w") as f:
+        json.dump(cache_options, f, indent=2)
+
+
+def load_cache_options() -> CacheOptions | None:
+    """
+    Load cache options from cache_options.json if it exists.
+    
+    Returns:
+        Cache options if file exists, None otherwise
+    """
+    cache_options_file = LOCAL_CACHE_ROOT / "cache_options.json"
+    if cache_options_file.exists():
+        try:
+            with cache_options_file.open("r") as f:
+                data = json.load(f)
+            # Validate required fields and provide defaults
+            return {
+                "history": data.get("history", 10),
+                "use_global": data.get("use_global", False),
+            }
+        except (json.JSONDecodeError, KeyError):
+            return None
+    return None
 
 
 class CacheHistoryEntry(TypedDict):
@@ -65,7 +131,7 @@ class CacheHistory:
         with self.history_file.open("w") as f:
             json.dump(data, f, indent=2)
 
-    def push(self, build: "NixBuild", cache_key: str | None = None) -> None:
+    def push(self, build: NixBuild, cache_key: str | None = None) -> None:
         """Add a new entry to the queue and clean up oldest entries."""
         build_id = build.build_id
 
@@ -74,6 +140,10 @@ class CacheHistory:
         json_path = self.history_file.parent / f"{file_key}.json"
         profile_path = self.history_file.parent / f"{file_key}-profile"
 
+        # Save the build files
+        build.save_json(json_path)
+        build.save_link(profile_path)
+        
         # Create entry from build (always uses build_id)
         entry: CacheHistoryEntry = {
             "build_id": build_id,
@@ -110,7 +180,17 @@ class CacheHistory:
         # Save updated history
         self._save()
 
-    def get(self, cache_key: str) -> CacheHistoryEntry | None:
+    def get(self, build: NixBuild) -> CacheHistoryEntry | None:
+        """Get an entry by build object using its build_id."""
+        build_id = build.build_id
+        
+        # Find entry by build_id
+        for entry in self._entries:
+            if entry["build_id"] == build_id:
+                return entry
+        return None
+    
+    def lookup(self, cache_key: str) -> CacheHistoryEntry | None:
         """Get an entry by cache key, resolving aliases if necessary."""
         # First check if cache_key is an alias
         build_id = self._aliases.get(cache_key, cache_key)
@@ -147,8 +227,9 @@ class CacheHistory:
 def load(
     build: NixBuild,
     *,
+    cache_key: str | None = None,
     use_global_cache: bool = False,
-    history: int | None = None,
+    history: int = 1,
 ) -> NixBuild:
     """
     Load a cached Nix build or save it if not cached.
@@ -163,7 +244,7 @@ def load(
     """
     return _load(
         build,
-        cache_key=build.build_id,
+        cache_key=cache_key,
         use_global_cache=use_global_cache,
         history=history,
     )
@@ -172,9 +253,9 @@ def load(
 def _load(
     build: NixBuild,
     *,
-    cache_key: str,
+    cache_key: str | None,
     use_global_cache: bool = False,
-    history: int | None = None,
+    history: int = 1,
 ) -> NixBuild:
     """
     Internal load method with customizable cache key.
@@ -191,42 +272,29 @@ def _load(
     cache_root = CACHE_ROOT if use_global_cache else LOCAL_CACHE_ROOT
     cache_root.mkdir(parents=True, exist_ok=True)
 
-    json_path = cache_root / f"{cache_key}.json"
-    profile_path = cache_root / f"{cache_key}-profile"
+    # Initialize cache history
+    history_file = cache_root / "history.json"
+    cache_history = CacheHistory(history_file, history)
 
-    # Check if cached version exists and load it
-    if json_path.exists():
-        try:
-            with json_path.open("r") as f:
-                data = json.load(f)
-
-            # Validate that the cached build_id matches the actual build
-            if data.get("build_id") == build.build_id:
+    # Try to find existing cache entry
+    if cache_key is not None:
+        # Use cache_key via aliases
+        entry = cache_history.lookup(cache_key)
+    else:
+        # Use build_id directly
+        entry = cache_history.get(build)
+    if entry is not None:
+        # Validate that the cached build_id matches the actual build
+        if entry["build_id"] == build.build_id:
+            json_path = Path(entry["json_path"])
+            if json_path.exists():
                 build.load(json_path)
-
-                # Update history if enabled
-                if history is not None:
-                    history_file = cache_root / "history.json"
-                    cache_history = CacheHistory(history_file, history)
-                    # Only add alias if cache_key differs from build_id
-                    alias_key = cache_key if cache_key != build.build_id else None
-                    cache_history.push(build, alias_key)
-
+                # Update history with this access
+                cache_history.push(build, cache_key)
                 return build
-        except (json.JSONDecodeError, KeyError):
-            # Invalid cache file, will rebuild
-            pass
 
     # Cache doesn't exist or is invalid, build and save
-    build.save_json(json_path)
-    build.save_link(profile_path)
-
-    # Update history if enabled
-    if history is not None:
-        history_file = cache_root / "history.json"
-        cache_history = CacheHistory(history_file, history)
-        # Only add alias if cache_key differs from build_id
-        alias_key = cache_key if cache_key != build.build_id else None
-        cache_history.push(build, alias_key)
+    # Note: push() will handle saving the files
+    cache_history.push(build, cache_key)
 
     return build

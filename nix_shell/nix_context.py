@@ -1,12 +1,17 @@
+from __future__ import annotations
+
 import base64
 from contextlib import contextmanager
 from contextvars import ContextVar
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Generator, Hashable
+from typing import TYPE_CHECKING, Generator, Hashable
 
 from nix_shell import cli, dsl
 from nix_shell.flake import FlakeRef, FlakeRefLock, fetch_locked_from_flake_ref
+
+if TYPE_CHECKING:
+    from nix_shell.cache import CacheOptions
 
 
 def _mk_var_name(expr: Hashable) -> str:
@@ -30,6 +35,9 @@ class NixContext:
     _params: dict[str, dsl.NixExpr | None] = field(default_factory=dict)
     _vars: dict[str, dsl.NixExpr] = field(default_factory=dict)
     _files: dict[Path, dsl.NixVar] = field(default_factory=dict)
+    
+    # Cache configuration
+    cache_options: CacheOptions | None = None
 
     def __getitem__(self, key: str) -> dsl.NixVar:
         """Get a variable by name from the context."""
@@ -94,6 +102,7 @@ class NixContext:
             }
 
         return args
+    
 
 
 _global_context: ContextVar[NixContext] = ContextVar("nix_global_context")
@@ -101,7 +110,12 @@ _global_context: ContextVar[NixContext] = ContextVar("nix_global_context")
 
 def get_nix_context() -> NixContext:
     """Get the current global Nix context, creating one if it doesn't exist."""
-    if (context := _global_context.get()) is None:
+    try:
+        context = _global_context.get()
+    except LookupError:
+        context = None
+    
+    if context is None:
         context = NixContext()
         _global_context.set(context)
     return context

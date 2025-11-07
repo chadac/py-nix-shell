@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import hashlib
 import json
 import logging
@@ -14,6 +16,7 @@ if TYPE_CHECKING:
     from nix_shell.cache import CacheHistoryEntry
 
 from nix_shell import cli, dsl
+import nix_shell.cache
 from nix_shell.constants import LOCAL_CACHE_ROOT
 from nix_shell.flake import FlakeRef, FlakeRefLock, fetch_locked_from_flake_ref
 from nix_shell.nix_context import NixContext, get_nix_context
@@ -62,10 +65,20 @@ class NixBuild:
     ) -> T:
         """Create a NixBuild from a Nix expression wrapped in a context."""
         ctx = ctx or get_nix_context()
-        return cls.create(
+        build = cls.create(
             expr=dsl.dumps(ctx.wrap(expr)),
             **ctx.build_args,
         )
+
+        # Apply caching if enabled in context
+        if ctx.cache_options is not None:
+            build = nix_shell.cache.load(
+                build,
+                use_global_cache=ctx.cache_options["use_global"],
+                history=ctx.cache_options["history"],
+            )
+
+        return build
 
     @classmethod
     def from_flake(
@@ -90,7 +103,7 @@ class NixBuild:
         )
 
     @classmethod
-    def from_cache(cls: type[T], entry: "CacheHistoryEntry") -> T:
+    def from_cache(cls: type[T], entry: CacheHistoryEntry) -> T:
         """Create a phantom NixBuild from a cache entry."""
         from pathlib import Path
 
