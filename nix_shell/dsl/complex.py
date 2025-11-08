@@ -88,7 +88,7 @@ dots = Dots()
 Param = TypeVar("Param", bound=NixVar | ParamWithDefault | Dots)
 
 
-def param(name: str, default: NixExpr | None) -> NixVar | ParamWithDefault:
+def param(name: str, default: NixExpr | None = None) -> NixVar | ParamWithDefault:
     """Create a function parameter, optionally with a default value."""
     if default is None:
         return var(name)
@@ -106,6 +106,7 @@ class Function(NixComplexType, Generic[Param]):
     def dumps(self) -> str:
         """Serialize this function to Nix syntax."""
         import textwrap
+
         from ..dsl.core import _indent
 
         params_str = ", ".join(dumps(p) for p in self.params)
@@ -137,8 +138,9 @@ class Let(NixComplexType):
 
     def dumps(self) -> str:
         """Serialize this let expression to Nix syntax."""
-        from ..dsl.core import _indent
         import textwrap
+
+        from ..dsl.core import _indent
 
         # Format each binding with proper indentation
         bindings = []

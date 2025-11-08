@@ -1,6 +1,11 @@
 #!/usr/bin/env python3
 """py-nix-shell CLI entry point."""
 
+import time
+
+start_time = time.time()
+
+
 import argparse
 import logging
 import os
@@ -12,7 +17,6 @@ from typing import Any
 
 import nix_shell
 from nix_shell.build import NixShell
-
 
 logger = logging.getLogger("pynix")
 
@@ -164,9 +168,11 @@ def load_shell_from_file(file_path: Path, *, disable_cache: bool = False) -> Nix
     if "shell" not in result:
         raise ValueError(f"no 'shell' variable found in {file_path}")
 
-    shell = result["shell"]
-    if not isinstance(shell, NixShell):
-        raise ValueError(f"'shell' variable in {file_path} is not a NixShell instance")
+    result = result["shell"]
+    if isinstance(result, NixShell):
+        shell = result
+    else:
+        shell = NixShell.from_expr_with_context(result)
 
     return shell
 
@@ -410,7 +416,7 @@ def main():
             )
 
         # Execute the requested command
-        logger.info(f"Executing command: {args.command}")
+        logger.debug(f"Executing command: {args.command}")
         if args.command == "activate":
             cmd_activate(shell)
         elif args.command == "env":
@@ -427,6 +433,7 @@ def main():
             cmd_show(shell)
         else:
             parser.error(f"unknown command: {args.command}")
+        logger.info(f"finished in {(time.time() - start_time) * 1000:.0f}ms")
     except Exception as e:
         if args.verbose >= 3:
             # -vvv: Show full stacktrace

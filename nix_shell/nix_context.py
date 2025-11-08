@@ -14,13 +14,13 @@ if TYPE_CHECKING:
 
 
 def _mk_var_name(expr: Hashable) -> str:
-    """Generate a unique variable name from a hashable expression."""
-    # Get the hash value as an integer, then convert to bytes
-    hash_value = hash(expr)
-    # Convert to bytes (8 bytes for 64-bit hash, signed)
-    hash_bytes = hash_value.to_bytes(8, "big", signed=True)
-    # Encode as base16 (hex) - only uses 0-9a-f characters
-    hex_string = hash_bytes.hex()
+    """Generate a deterministic variable name from a hashable expression."""
+    import hashlib
+
+    # Use deterministic hash instead of Python's randomized hash()
+    content = str(expr).encode("utf-8")
+    hash_obj = hashlib.md5(content, usedforsecurity=False)
+    hex_string = hash_obj.hexdigest()[:16]  # Use first 16 chars for shorter names
     return "var_" + hex_string
 
 
@@ -113,9 +113,9 @@ class NixContext:
 
         if self._files:
             # Use --arg to pass paths as Nix paths
-            args["arg"] = {var.value: f"./{path}" for path, var in self._files.items()}
-            # Set impure mode for local file access
-            args["impure"] = True
+            args["arg_from_file"] = {
+                var.value: f"./{path}" for path, var in self._files.items()
+            }
 
         return args
 

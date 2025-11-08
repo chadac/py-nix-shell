@@ -128,9 +128,8 @@ def import_flake_from_files(files: dict[str, dsl.NixVar]) -> dsl.NixExpr:
     """
     Create a Nix expression that behaves like builtins.getFlake on a virtual set of files.
 
-    This creates a store derivation containing the files and then manually evaluates
-    the flake.nix file with proper inputs, which is more reliable than trying to
-    use builtins.getFlake with store paths or external tools like call-flake.
+    Uses NixOS/flake-compat to properly evaluate the flake from store paths, which is
+    the standard, robust solution for this use case.
 
     Args:
         files: Dict mapping relative file paths to NixVar objects representing the files
@@ -150,20 +149,34 @@ def import_flake_from_files(files: dict[str, dsl.NixVar]) -> dsl.NixExpr:
     if "flake.lock" not in files:
         raise ValueError("flake.lock file is required")
 
-    # Create symlink commands for each file
-    link_commands = []
-    for path, var in files.items():
-        # Use ${} for proper variable interpolation in the shell script
-        link_commands.append(f"ln -s ${{{var.value}}} $out/{path}")
+    # Since the files already have NixVars (paths in context), we'll
+    # build the virtual filesystem directly here using cat with here-documents
 
-    # Build the shell script with proper formatting
+    # Build the shell script using cat with here-documents
     shell_script_lines = ["mkdir -p $out"]
-    shell_script_lines.extend(link_commands)
+    for path, var in files.items():
+        # Use cat with here-document to write file contents
+        shell_script_lines.append(f"cat <<'NIX_EOF' > $out/{path}")
+        shell_script_lines.append(f"${{{var.value}}}")
+        shell_script_lines.append("NIX_EOF")
     shell_script = "\n".join(shell_script_lines)
 
-    # Manual flake evaluation - import flake.nix and call its outputs function
-    # This is the most reliable approach that works with store paths
+    # Use flake-compat to evaluate the flake from the store path
+    # Following the pattern from call-flake-pattern.nix
     virtual_flake = dsl.let(
+        # Define the callFlake helper function
+        callFlake=dsl.func(
+            params=[dsl.param("src")],
+            expr=dsl.let(
+                flake=dsl.call(
+                    dsl.raw("builtins.getFlake"),
+                    "github:NixOS/flake-compat/f387cd2afec9419c8ee37694406ca490c3f34ee5",
+                ),
+                func=dsl.call(dsl.raw("import"), dsl.raw('("${flake}")')),
+                result=dsl.call(dsl.v("func"), {"src": dsl.v("src")}),
+                in_=dsl.v("result")["outputs"],
+            ),
+        ),
         # Create the virtual directory containing the flake files
         flakeDir=dsl.call(
             ctx["pkgs"]["runCommand"],
@@ -171,26 +184,8 @@ def import_flake_from_files(files: dict[str, dsl.NixVar]) -> dsl.NixExpr:
             {},
             shell_script,
         ),
-        # Import flake.nix and evaluate it manually
-        flakeNix=dsl.call(
-            dsl.raw("import"),
-            dsl.raw('((toString flakeDir) + "/flake.nix")')
-        ),
-        # Parse flake.lock for input information
-        flakeLock=dsl.call(
-            dsl.raw("builtins.fromJSON"),
-            dsl.call(
-                dsl.raw("builtins.readFile"),
-                dsl.raw('((toString flakeDir) + "/flake.lock")'),
-            ),
-        ),
-        # Construct inputs based on the lock file
-        inputs={
-            "nixpkgs": ctx["nixpkgs"],
-            "self": None,  # Self-reference handled specially (None becomes null)
-        },
-        # Call the flake outputs function
-        in_=dsl.call(dsl.v("flakeNix")["outputs"], dsl.v("inputs")),
+        # Call the flake using our helper function
+        in_=dsl.call(dsl.v("callFlake"), {"src": dsl.v("flakeDir")}),
     )
 
     return virtual_flake

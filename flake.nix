@@ -14,9 +14,12 @@
     perSystem = { pkgs, ... }: {
       packages.default = pkgs.callPackage ./. { };
       devShells = {
-        default = inputs.devenv.lib.mkShell {
+        default = pkgs.mkShell {
+          packages = with pkgs; [ python313 uv just pre-commit ];
+        };
+        devenv = inputs.devenv.lib.mkShell {
           inherit inputs pkgs;
-          modules = [ ./devenv.nix ];
+          modules = [ "${inputs.self}/devenv.nix" ];
         };
 
         # sample; used for testing as well

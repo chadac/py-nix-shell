@@ -10,7 +10,7 @@ import logging
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
-from nix_shell import cli, dsl
+from nix_shell import cli
 from nix_shell.build import NixShell
 
 if TYPE_CHECKING:
@@ -19,7 +19,12 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-def init(*, minimal: bool = False, ctx: NixContext | None = None) -> None:
+def init(
+    *,
+    minimal: bool = False,
+    files: list[str] | None = None,
+    ctx: NixContext | None = None,
+) -> None:
     """
     Load existing flake data into the NixContext.
 
@@ -28,6 +33,8 @@ def init(*, minimal: bool = False, ctx: NixContext | None = None) -> None:
     Args:
         minimal: If True, adds individual flake files to context for direct evaluation.
                 If False, uses builtins.getFlake with locked reference.
+        files: Additional files to include in the virtual flake (only used when minimal=True).
+               These files will be copied alongside flake.nix and flake.lock.
         ctx: NixContext to load flake into (defaults to current global context)
     """
     from nix_shell.nix_context import get_nix_context
@@ -56,13 +63,24 @@ def init(*, minimal: bool = False, ctx: NixContext | None = None) -> None:
         # Import the flake using our file-based evaluation
         from nix_shell.flake import import_flake_from_files
 
-        files = {
+        flake_files = {
             "flake.nix": flake_nix_var,
             "flake.lock": flake_lock_var,
         }
 
-        ctx["projectFlake"] = import_flake_from_files(files)
-        logger.info("added flake files to context for direct evaluation")
+        # Add additional files if specified
+        if files:
+            for file_path in files:
+                file_path_obj = Path(file_path)
+                if not file_path_obj.exists():
+                    raise FileNotFoundError(f"Additional file not found: {file_path}")
+                file_var = ctx.path(file_path_obj)
+                flake_files[file_path] = file_var
+
+        ctx["projectFlake"] = import_flake_from_files(flake_files)
+        logger.info(
+            f"added flake files to context for direct evaluation: {list(flake_files.keys())}"
+        )
     else:
         # Use builtins.getFlake with the current directory as locked reference
         flake_ref = Path.cwd().resolve()
@@ -86,66 +104,30 @@ def devshell(
     from nix_shell.nix_context import get_nix_context
 
     ctx = ctx or get_nix_context()
-    flake_nix_path = Path("flake.nix")
-    flake_lock_path = Path("flake.lock")
 
-    if not flake_nix_path.exists():
-        raise FileNotFoundError("flake.nix not found. Run flake_nix.init() first.")
-
-    # Check if this is a minimal setup (individual files) or full flake reference
-    has_flake_files = any(
-        str(flake_nix_path.resolve()) in str(path)
-        or str(flake_lock_path.resolve()) in str(path)
-        for path in ctx._files.keys()
-    )
-
-    if has_flake_files:
-        # Minimal approach: evaluate flake directly from files
-        # Build a Nix expression that imports the flake and accesses the target
+    # Check if we have projectFlake in context (from init with minimal=True)
+    # If so, use the full approach that accesses projectFlake directly
+    if "projectFlake" in ctx._vars:
+        # Full approach: use projectFlake from context (created by init with minimal=True)
+        # Extract the target from the flake
         target_parts = target.split(".")
 
-        # Create expression: (import ./flake.nix).outputs { ... }.devShells.${system}.default
-        flake_var = ctx.path(flake_nix_path)
-        ctx.path(flake_lock_path)  # Ensure lock file is added to context
+        # Insert system if not already specified in target
+        # Standard flake structure: devShells.{system}.{name}
+        system = cli.current_system()
+        if (
+            system not in target
+            and len(target_parts) >= 2
+            and target_parts[0] == "devShells"
+        ):
+            # Insert system between devShells and the shell name
+            target_parts.insert(1, system)
 
-        # For minimal flakes, we need to reconstruct the flake evaluation
-        expr = dsl.let(
-            flakeNix=dsl.call(dsl.raw("import"), flake_var),
-            # Get system
-            system=cli.current_system(),
-            # Construct inputs (simplified for minimal case)
-            inputs={
-                "self": None,  # Will be replaced during evaluation
-                "nixpkgs": dsl.builtins["getFlake"](
-                    "github:NixOS/nixpkgs/nixos-unstable"
-                ),
-                "flake-utils": dsl.builtins["getFlake"]("github:numtide/flake-utils"),
-            },
-            in_=_build_nested_access(
-                dsl.call(dsl.v("flakeNix")["outputs"], dsl.v("inputs")),
-                target_parts + [dsl.v("system")],
-            ),
-        )
+        expr = _build_nested_access(ctx["projectFlake"], target_parts)
     else:
-        # Full approach: use getFlake reference if available
-        if "projectFlake" in ctx._vars:
-            # Extract the target from the flake
-            target_parts = target.split(".")
+        raise RuntimeError("Need to call flake_nix.init()")
 
-            # Only append system if not already specified in target
-            system = cli.current_system()
-            if system not in target_parts:
-                target_parts.append(system)
-
-            expr = _build_nested_access(ctx["projectFlake"], target_parts)
-        else:
-            raise ValueError(
-                "No flake data found in context. Run flake_nix.init() first."
-            )
-
-    # Create NixShell from the expression
-    shell = NixShell.from_expr_with_context(expr, ctx)
-    return shell
+    return expr
 
 
 def _build_nested_access(base_expr: Any, path_parts: list[Any]) -> Any:

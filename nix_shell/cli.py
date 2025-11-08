@@ -1,6 +1,7 @@
 """Interface for invoking the Nix CLI from Python."""
 
 import json
+import logging
 import subprocess
 from functools import cache
 from pathlib import Path
@@ -9,6 +10,8 @@ from typing import NotRequired, TypedDict, Unpack
 from nix_shell.utils import format_nix
 
 from .exceptions import wrap_subprocess_error
+
+logger = logging.getLogger("py-nix-shell")
 
 
 class NixBuildArgs(TypedDict):
@@ -74,8 +77,6 @@ def _cmd(
     **params: Unpack[NixBuildArgs],
 ) -> str:
     """Execute a nix command with the given parameters and return its output."""
-    import logging
-
     args = _parse_args(**params) + extra_args
 
     if isinstance(cmd, str):
@@ -84,10 +85,9 @@ def _cmd(
         cmds = cmd
 
     full_cmd = ["nix"] + cmds + args
-    logger = logging.getLogger("py-nix-shell")
 
     # Log the command at DEBUG level
-    logger.debug(f"Running command: {' '.join(full_cmd)}")
+    logger.debug(f"executing command: {' '.join(full_cmd)}")
 
     # Check if we should capture stderr for -vvv mode
     if logger.isEnabledFor(logging.DEBUG):

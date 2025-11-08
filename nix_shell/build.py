@@ -15,13 +15,16 @@ from typing import TYPE_CHECKING, Any, Callable, Self, TypeVar, Unpack
 if TYPE_CHECKING:
     from nix_shell.cache import CacheHistoryEntry
 
-from nix_shell import cli, dsl
 import nix_shell.cache
+from nix_shell import cli, dsl
 from nix_shell.constants import LOCAL_CACHE_ROOT
 from nix_shell.flake import FlakeRef, FlakeRefLock, fetch_locked_from_flake_ref
 from nix_shell.nix_context import NixContext, get_nix_context
 
 T = TypeVar("T", bound="NixBuild")
+
+
+logger = logging.getLogger("pynix")
 
 
 @dataclass
@@ -59,6 +62,7 @@ class NixBuild:
     ) -> T:
         """Create a NixBuild from a Nix expression wrapped in a context."""
         ctx = ctx or get_nix_context()
+
         build = cls.create(
             expr=dsl.dumps(ctx.wrap(expr)),
             **ctx.build_args,
@@ -66,6 +70,7 @@ class NixBuild:
 
         # Apply caching if enabled in context
         if ctx.cache_options is not None:
+            logger.debug("loading shell from cache")
             build = nix_shell.cache.load(
                 build,
                 use_global_cache=ctx.cache_options["use_global"],
@@ -111,8 +116,7 @@ class NixBuild:
 
         return instance
 
-    @cached_property
-    def build_id(self) -> str:
+    def _get_build_id(self) -> str:
         """
         Identifier for the build.
 
@@ -148,6 +152,10 @@ class NixBuild:
         h.update(self.params.get("expr", "no-expr").encode())
         return h.hexdigest()
 
+    @cached_property
+    def build_id(self) -> str:
+        return self._get_build_id()
+
     def build(self) -> None:
         """Alias for `nix build`."""
         out_paths = cli.build(no_link=True, print_out_paths=True, **self.params)
@@ -180,8 +188,7 @@ class NixBuild:
         """Save the metadata from a Nix build (ID, derivation, dev env) to a JSON file."""
         data = {}
         for key in self._venv_keys:
-            if key in self.__dict__:
-                data[key] = self.__dict__[key]
+            data[key] = getattr(self, key)
         with dest.open("w") as f:
             json.dump(data, f)
 
@@ -191,6 +198,7 @@ class NixBuild:
 
     def load(self, json_path: Path) -> None:
         """Load cached build data from a JSON file into this instance."""
+        logger.debug(f"loading cached build results from {json_path}")
         with json_path.open("r") as f:
             data = json.load(f)
 

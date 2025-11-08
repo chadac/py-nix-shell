@@ -123,23 +123,23 @@ def cli():
 <!-- CLI_HELP_START -->
 ```
 $ pynix --help
-py-nix-shell - Nix shell environment manager
+pynix - Nix shell environment manager
 
 USAGE:
   pynix [COMMAND] [OPTIONS]
 
 COMMANDS:
-  Environment Management:
-    env        (default) Print shell activation script
+  environment management:
+    env        Print shell activation script
     activate   Spawn interactive shell with environment loaded
 
-  Nix aliases:
+  nix aliases:
     shell      Run 'nix shell' directly
     develop    Run 'nix develop' directly
     build      Run 'nix build' directly
     print-dev-env  Print raw 'nix print-dev-env' output
 
-  Useful tools:
+  useful tools:
     show       Display the Nix expression to be evaluated
 
 OPTIONS:

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import time
 from pathlib import Path
 from typing import TYPE_CHECKING, TypedDict
@@ -10,9 +11,10 @@ from typing import TYPE_CHECKING, TypedDict
 if TYPE_CHECKING:
     from nix_shell.build import NixBuild
 
+from nix_shell.constants import CACHE_ROOT, LOCAL_CACHE_ROOT
 from nix_shell.nix_context import NixContext, get_nix_context
 
-from nix_shell.constants import CACHE_ROOT, LOCAL_CACHE_ROOT
+logger = logging.getLogger("pynix")
 
 
 class CacheOptions(TypedDict):
@@ -41,6 +43,7 @@ def use_cache(
     ctx = ctx or get_nix_context()
 
     if ctx.disable_cache:
+        logger.debug("disabling cache for current context")
         return
 
     cache_options: CacheOptions = {
@@ -190,6 +193,7 @@ class CacheHistory:
         # Find entry by build_id
         for entry in self._entries:
             if entry["build_id"] == build_id:
+                entry["timestamp"] = time.time()
                 return entry
         return None
 
@@ -201,6 +205,7 @@ class CacheHistory:
         # Find entry by build_id
         for entry in self._entries:
             if entry["build_id"] == build_id:
+                entry["timestamp"] = time.time()
                 return entry
         return None
 
@@ -286,15 +291,16 @@ def _load(
     else:
         # Use build_id directly
         entry = cache_history.get(build)
+
     if entry is not None:
-        # Validate that the cached build_id matches the actual build
-        if entry["build_id"] == build.build_id:
-            json_path = Path(entry["json_path"])
-            if json_path.exists():
-                build.load(json_path)
-                # Update history with this access
-                cache_history.push(build, cache_key)
-                return build
+        logger.debug(
+            f"loading cache for {entry['build_id']}",
+        )
+        json_path = Path(entry["json_path"])
+        if json_path.exists():
+            build.load(json_path)
+            cache_history._save()
+            return build
 
     # Cache doesn't exist or is invalid, build and save
     # Note: push() will handle saving the files
