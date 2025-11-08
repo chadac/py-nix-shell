@@ -35,8 +35,10 @@ Recent changes:
 2. Run `just format` to auto-format
 3. Run `just lint` to check for issues
 4. Run `just test` to ensure all tests pass
-5. Fix any issues found by the above commands
+5. Run `pre-commit run --all-files` to validate all checks pass
+6. Fix any issues found by the above commands
 
 This ensures consistent code style and catches issues early.
 
 **Important**: Always run `just check` after making any code changes to ensure consistent formatting and linting.
+**Critical**: Always run `pre-commit run --all-files` before completing tasks to ensure all quality gates pass.
