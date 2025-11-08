@@ -4,7 +4,7 @@ from contextlib import contextmanager
 from contextvars import ContextVar
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import TYPE_CHECKING, Generator, Hashable
+from typing import TYPE_CHECKING, Generator
 
 from nix_shell import cli, dsl
 from nix_shell.flake import FlakeRef, FlakeRefLock, fetch_locked_from_flake_ref
@@ -13,12 +13,12 @@ if TYPE_CHECKING:
     from nix_shell.cache import CacheOptions
 
 
-def _mk_var_name(expr: Hashable) -> str:
+def _mk_var_name_from_path(path: Path) -> str:
     """Generate a deterministic variable name from a hashable expression."""
     import hashlib
 
     # Use deterministic hash instead of Python's randomized hash()
-    content = str(expr).encode("utf-8")
+    content = str(path.absolute()).encode("utf-8")
     hash_obj = hashlib.md5(content, usedforsecurity=False)
     hex_string = hash_obj.hexdigest()[:16]  # Use first 16 chars for shorter names
     return "var_" + hex_string
@@ -94,7 +94,7 @@ class NixContext:
         """Add a file path to the context and return its variable."""
         if path in self._files:
             return self._files[path]
-        var_name = _mk_var_name(str(path.absolute()))
+        var_name = _mk_var_name_from_path(path)
         self._params[var_name] = None
         self._files[path] = dsl.NixVar(var_name)
         return self._files[path]
@@ -112,9 +112,9 @@ class NixContext:
         args: cli.NixBuildArgs = {}
 
         if self._files:
-            # Use --arg to pass paths as Nix paths
+            # Use --arg-from-file to pass file paths
             args["arg_from_file"] = {
-                var.value: f"./{path}" for path, var in self._files.items()
+                var.value: path for path, var in self._files.items()
             }
 
         return args

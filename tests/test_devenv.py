@@ -2,9 +2,9 @@
 
 from nix_shell import dsl
 from nix_shell.build import NixShell
-from nix_shell.devenv import DevenvShell
 from nix_shell.dsl.filesystem import StorePath
 from nix_shell.module import Module, ModuleExpr
+from nix_shell.third_party.devenv import DevenvShell
 from tests.helpers import assert_match_nix
 
 sample_module = Module(

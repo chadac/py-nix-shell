@@ -25,7 +25,7 @@ def nixhub(package: str, version: str = "latest") -> Asset:
 
 
 def github_release(owner: str, repo: str, version: str) -> Asset:
-    pass
+    raise NotImplementedError
 
 
 def web(url: str) -> Asset:

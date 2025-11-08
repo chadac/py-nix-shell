@@ -5,9 +5,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 
-
-from .core import NixExpr, NixExprType
 from .common_vars import builtins
+from .core import NixExpr, NixExprType
 
 
 @dataclass(frozen=True)

@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import NotRequired, TypedDict
+from typing import NotRequired, TypedDict, cast
 
 from nix_shell import cli, dsl
 from nix_shell.constants import PKG_FLAKE_LOCK
@@ -83,14 +83,16 @@ def fetch_locked_from_flake_ref(ref: FlakeRef) -> FlakeRefLock:
     Flake URLs are often not reproducible; however, the result of this
     is properly hashed and reproducible.
     """
+    tree_ref: FlakeRefLock
     if isinstance(ref, str):
-        tree_ref = dict(cli.flake.metadata(ref)["locked"])
-        tree_ref.pop("__final", None)
+        new_ref = dict(cli.flake.metadata(ref)["locked"])
+        new_ref.pop("__final", None)
+        tree_ref = cast(FlakeRefLock, new_ref)
     elif isinstance(ref, Path):
         return fetch_locked_from_flake_ref(f"path:{str(ref.absolute())}")
     else:
-        tree_ref = ref
-    return tree_ref  # type: ignore
+        tree_ref = cast(FlakeRefLock, ref)
+    return tree_ref
 
 
 def get_locked_from_lockfile(
@@ -101,7 +103,7 @@ def get_locked_from_lockfile(
 
     Args:
         flake_lock (Path | str): The path to the `flake.lock` file.
-        nixpkgs (str): The name of the node to grab.
+        name (str): The name of the node to grab.
     """
     with open(flake_lock, "r") as f:
         lock = json.load(f)

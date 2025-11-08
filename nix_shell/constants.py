@@ -5,7 +5,17 @@ from pathlib import Path
 
 
 def _get_local_cache_root() -> Path:
-    """Determine the local cache root, preferring virtualenv-local cache when available."""
+    """Determine the local cache root, preferring project-local cache when available."""
+    # Check if we're running from direnv
+    direnv_dir = os.environ.get("DIRENV_DIR")
+    if direnv_dir:
+        # Remove the leading '-' that direnv adds to the path
+        if direnv_dir.startswith("-"):
+            direnv_dir = direnv_dir[1:]
+        # Use .direnv/cache/py-nix-shell when running from direnv
+        direnv_cache = Path(direnv_dir) / ".direnv" / "cache" / "py-nix-shell"
+        return direnv_cache
+
     # Check if we're in a virtualenv
     venv_path = os.environ.get("VIRTUAL_ENV")
     if venv_path:

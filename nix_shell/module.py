@@ -12,15 +12,16 @@ from nix_shell import dsl
 class ModuleType(ABC):
     """Base class for all module types in the Nix module system."""
 
-    def _update_source_location(self):
+    def _update_source_location(self) -> None:
         """Capture source location where this module was instantiated for debugging."""
         # Capture source location where this module was instantiated
         # Used for debugging purposes
         self._source_location: str | None = None
         frame = inspect.currentframe()
         assert frame is not None
-        while (frame := frame.f_back) is not None:
-            module = frame.f_globals["__name__"]
+        while (next_frame := frame.f_back) is not None:
+            frame = next_frame
+            module = next_frame.f_globals["__name__"]
             if module == "nix_shell.module":
                 continue
             self._source_location = f"{module}:{frame.f_lineno}"
@@ -55,7 +56,7 @@ class ModuleType(ABC):
 class Module(ModuleType):
     """A Nix module with parameters, options, and configuration."""
 
-    params: list[dsl.Param] | None = None
+    params: list[dsl.NixVar | dsl.ParamWithDefault] | None = None
     options: dsl.NixExpr | None = None
     config: dsl.NixExpr | None = None
     _file: str | None = None

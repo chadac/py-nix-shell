@@ -16,6 +16,9 @@
       devShells = {
         default = pkgs.mkShell {
           packages = with pkgs; [ python313 uv just pre-commit ];
+          shellHook = ''
+            source .venv/bin/activate
+	  '';
         };
         devenv = inputs.devenv.lib.mkShell {
           inherit inputs pkgs;

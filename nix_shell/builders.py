@@ -5,13 +5,13 @@ from typing import NotRequired, TypedDict, Unpack
 from nix_shell import cli, dsl
 from nix_shell.build import NixShell
 from nix_shell.constants import PKG_FLAKE_LOCK
-from nix_shell.dsl_utils import import_nixpkgs
 from nix_shell.flake import (
     FlakeRefLock,
     fetch_locked_from_flake_ref,
     get_locked_from_impure_nixpkgs,
     get_locked_from_lockfile,
 )
+from nix_shell.nix_context import get_nix_context
 
 
 class NixpkgsParams(TypedDict):
@@ -148,24 +148,22 @@ class NixShellBuilder(dsl.NixComplexType):
     @property
     def _expr(self) -> dsl.NixExpr:
         """Generate the mkShell Nix expression for this builder."""
+        ctx = get_nix_context()
+
         shell_hook = list(self.shell_hook)
         if library_path := self._nix_library_path():
             shell_hook.append(
                 f'export LD_LIBRARY_PATH=\\"{library_path}:$LD_LIBRARY_PATH\\"'
             )
 
-        return dsl.let(
-            pkgs=import_nixpkgs(locked=self.nixpkgs_locked, system=self.system),
-            in_=dsl.call(
-                "pkgs.mkShell",
-                dsl.attrs(
-                    packages=_with_pkgs(self.packages),
-                    inputsFrom=_with_pkgs(self.inputs_from),
-                    buildInputs=_with_pkgs(self.build_inputs),
-                    shellHook="\n".join(shell_hook),
-                    **self.extra_args,
-                ),
-            ),
+        return ctx["pkgs"]["mkShell"](
+            {
+                "packages": _with_pkgs(self.packages),
+                "inputsFrom": _with_pkgs(self.inputs_from),
+                "buildInputs": _with_pkgs(self.build_inputs),
+                "shellHook": "\n".join(shell_hook),
+                **self.extra_args,
+            }
         )
 
     def dumps(self) -> str:
@@ -177,9 +175,7 @@ def mk_shell_expr(
     **kwargs: Unpack[MkShellParams],
 ) -> str:
     """Generate the `shell.nix` expresssion for `mk_shell`"""
-    nixpkgs_locked = lock_nixpkgs(**kwargs)
     shell = NixShellBuilder(
-        nixpkgs_locked,
         packages=kwargs.get("packages", []),  # type: ignore
         inputs_from=kwargs.get("inputs_from", []),  # type: ignore
         build_inputs=kwargs.get("build_inputs", []),  # type: ignore
@@ -191,15 +187,15 @@ def mk_shell_expr(
     return dsl.dumps(shell)
 
 
-def _with_pkgs(packages: list[str | dsl.NixExpr]) -> dsl.NixExpr:
+def _with_pkgs(packages: list[str | dsl.NixExpr]) -> list[dsl.NixExpr]:
     """Convert a list of package names/expressions to a Nix list with pkgs prefix."""
-    nix_packages = []
+    nix_packages: list[dsl.NixExpr] = []
     for pkg in packages:
         if isinstance(pkg, str):
-            nix_packages.append(dsl.call(f"pkgs.{pkg}"))
+            nix_packages.append(dsl.call(dsl.raw(f"pkgs.{pkg}")))
         else:
             nix_packages.append(pkg)
-    return dsl.list(*nix_packages)
+    return nix_packages
 
 
 def mk_shell(**kwargs: Unpack[MkShellParams]) -> NixShell:

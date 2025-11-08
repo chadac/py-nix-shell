@@ -1,5 +1,4 @@
 from nix_shell import cache, flake_nix
-from nix_shell.cache import use_cache
 from nix_shell._global_subprocess import (
     Popen,
     call,
@@ -14,6 +13,7 @@ from nix_shell.builders import (
     from_nix,
     mk_shell,
 )
+from nix_shell.cache import use_cache
 from nix_shell.nix_context import context
 
 __all__ = [

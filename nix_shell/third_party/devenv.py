@@ -124,7 +124,7 @@ def init(
     ctx: NixContext | None = None,
 ) -> DevenvShell:
     """Initialize a devenv shell with optional configuration and modules."""
-    modules = []
+    modules: list[ModuleType] = []
 
     # load a custom set of attrs
     if attrs is not None:

@@ -15,4 +15,4 @@ def python_project(
         opts["uv"] = {
             "enable": True,
         }
-    return devenv.module(opts)
+    raise NotImplementedError()

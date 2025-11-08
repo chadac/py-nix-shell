@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Optional
 
 from nix_shell import cli, dsl
+from nix_shell.dsl.complex import NixVar
 from nix_shell.flake import FlakeRefLock
 from nix_shell.nix_context import NixContext, get_nix_context
 from nix_shell.utils import find_shared_root
@@ -29,31 +30,29 @@ def import_nixpkgs(locked: FlakeRefLock, system: str | None = None) -> dsl.NixEx
 class FileSet:
     """A set of files that can be built into a Nix store path."""
 
-    paths: dict[Path, dsl.StorePath]
+    paths: dict[Path, NixVar]
 
     @classmethod
-    def union(cls, paths: list[Path]):
+    def union(cls, paths: list[Path], ctx: NixContext | None = None):
         """Create a FileSet from a list of file paths with a common root."""
+        ctx = ctx or get_nix_context()
         root = find_shared_root(paths)
         result = {}
         for src_path in paths:
             dest_path = src_path.relative_to(root)
-            result[dest_path] = dsl.StorePath.from_path(src_path)
+            result[dest_path] = ctx.path(src_path)
         return cls(result)
 
     @classmethod
-    def virtual(cls, paths: dict[Path | str, str]):
+    def virtual(cls, paths: dict[Path, Path | str]):
         """Create a FileSet from virtual files with specified content."""
-        result = {}
-        for dest_path, content in paths.items():
-            result[Path(dest_path)] = dsl.StorePath.from_string(content)
-        return cls(result)
+        raise NotImplementedError()
 
     def mk_expr(self, ctx: NixContext) -> dsl.NixExpr:
         """Generate a Nix expression that creates a directory with these files."""
         cmds = []
         mk_dirs = set([])
-        for dest_path, nix_file in self.paths.items():
+        for dest_path, var in self.paths.items():
             parent = dest_path.parent
 
             # if the parent dir doesn't exist yet, make it
@@ -61,7 +60,7 @@ class FileSet:
                 cmds += [f"mkdir -p $out/{parent}"]
                 mk_dirs.add(parent)
 
-            cmds += [f"ln -s {ctx[nix_file]} $out/{dest_path}"]
+            cmds += [f"ln -s {var.value} $out/{dest_path}"]
 
         return ctx["pkgs"]["runCommand"]("src", {}, "\n".join(cmds))
 

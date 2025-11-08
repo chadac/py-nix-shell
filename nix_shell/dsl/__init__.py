@@ -1,11 +1,5 @@
 """Nix expression builder and utilities."""
 
-from .core import (
-    NixComplexType,
-    NixExpr,
-    NixExprType,
-    dumps,
-)
 from .complex import (
     Attrs,
     Function,
@@ -26,11 +20,17 @@ from .complex import (
     var,
     w,
 )
+from .core import (
+    NixComplexType,
+    NixExpr,
+    NixExprType,
+    dumps,
+)
 from .filesystem import StorePath
 from .variables import (
-    pkgs,
-    lib,
     builtins,
+    lib,
+    pkgs,
 )
 
 __all__ = [

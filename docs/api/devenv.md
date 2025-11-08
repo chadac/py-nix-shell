@@ -1,1 +1,1 @@
-::: nix_shell.devenv
+::: nix_shell.third_party.devenv

@@ -10,7 +10,7 @@ import sys
 from dataclasses import dataclass, field
 from functools import cached_property
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Callable, Self, TypeVar, Unpack
+from typing import TYPE_CHECKING, Any, Callable, Self, TypeVar, Unpack, cast
 
 if TYPE_CHECKING:
     from nix_shell.cache import CacheHistoryEntry
@@ -62,16 +62,14 @@ class NixBuild:
     ) -> T:
         """Create a NixBuild from a Nix expression wrapped in a context."""
         ctx = ctx or get_nix_context()
-
-        build = cls.create(
-            expr=dsl.dumps(ctx.wrap(expr)),
-            **ctx.build_args,
-        )
+        build_args = ctx.build_args
+        build_args["expr"] = dsl.dumps(expr)
+        build = cls.create(**build_args)
 
         # Apply caching if enabled in context
         if ctx.cache_options is not None:
             logger.debug("loading shell from cache")
-            build = nix_shell.cache.load(
+            nix_shell.cache.load(
                 build,
                 use_global_cache=ctx.cache_options["use_global"],
                 history=ctx.cache_options["history"],
@@ -96,7 +94,10 @@ class NixBuild:
         return cls.create(
             expr=dsl.dumps(
                 dsl.let(
-                    flake=dsl.builtins["getFlake"](locked), in_=dsl.v("flake")[output]
+                    flake=dsl.builtins["getFlake"](
+                        cast(dict[str, dsl.NixExpr], locked)
+                    ),
+                    in_=dsl.v("flake")[output],
                 )
             )
         )

@@ -6,7 +6,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from nix_shell import cli, dsl
-from nix_shell.dsl import FileSet, NixExpr, NixExprType, StorePath, raw
+from nix_shell.dsl import NixExpr, NixExprType, StorePath, raw
 from tests.helpers import assert_match_nix
 
 
