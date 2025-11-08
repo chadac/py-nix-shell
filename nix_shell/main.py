@@ -12,7 +12,6 @@ from typing import Any
 
 import nix_shell
 from nix_shell.build import NixShell
-from nix_shell.exceptions import NixError
 
 
 logger = logging.getLogger("pynix")
@@ -144,10 +143,19 @@ def get_default_namespace() -> dict[str, Any]:
     return {k: v for k, v in nix_shell.__dict__.items() if not k.startswith("_")}
 
 
-def load_shell_from_file(file_path: Path) -> NixShell:
+def load_shell_from_file(file_path: Path, *, disable_cache: bool = False) -> NixShell:
     """Load a shell from a Python file by executing it and extracting the 'shell' variable."""
     if not file_path.exists():
         raise FileNotFoundError(f"shell file not found: {file_path}")
+
+    # Check for cache options and apply to global context (unless disabled)
+    from nix_shell.nix_context import get_nix_context
+
+    # Handle caching
+    if disable_cache:
+        logger.debug("caching disabled for this operation")
+        ctx = get_nix_context()
+        ctx.disable_cache = True
 
     # Execute the Python file and extract the shell variable
     namespace: dict[str, Any] = get_default_namespace()
@@ -390,12 +398,16 @@ def main():
             shell = load_shell_from_expression(expression)
         elif args.file:
             logger.info(f"using shell file: {args.file}")
-            shell = load_shell_from_file(args.file)
+            shell = load_shell_from_file(
+                args.file, disable_cache=(args.command == "show")
+            )
         else:
             # Default to shell.py in current directory
             shell_file = Path("shell.py")
             logger.info(f"using default shell file: {shell_file}")
-            shell = load_shell_from_file(shell_file)
+            shell = load_shell_from_file(
+                shell_file, disable_cache=(args.command == "show")
+            )
 
         # Execute the requested command
         logger.info(f"Executing command: {args.command}")
@@ -415,15 +427,17 @@ def main():
             cmd_show(shell)
         else:
             parser.error(f"unknown command: {args.command}")
-    except FileNotFoundError as e:
-        logger.error(str(e))
-    except ValueError as e:
-        logger.error(str(e))
-    except NixError as e:
-        logger.error(str(e))
     except Exception as e:
-        logger.error(f"unexpected error: {e}")
-        raise
+        if args.verbose >= 3:
+            # -vvv: Show full stacktrace
+            logger.error(e)
+            import traceback
+
+            traceback.print_exc()
+            sys.exit(1)
+        else:
+            logger.error(e)
+            sys.exit(1)
 
 
 if __name__ == "__main__":

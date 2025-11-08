@@ -105,7 +105,17 @@ class Function(NixComplexType, Generic[Param]):
 
     def dumps(self) -> str:
         """Serialize this function to Nix syntax."""
-        return f"({{{', '.join(dumps(p) for p in self.params)}}}: {dumps(self.expr)})"
+        import textwrap
+        from ..dsl.core import _indent
+
+        params_str = ", ".join(dumps(p) for p in self.params)
+        expr_str = dumps(self.expr)
+
+        # For complex expressions, format with line breaks
+        if "\n" in expr_str or len(params_str) > 40:
+            return f"(\n  {{ {params_str} }}:\n{textwrap.indent(expr_str, _indent)}\n)"
+        else:
+            return f"({{ {params_str} }}: {expr_str})"
 
 
 def func(params: list[Param], expr: NixExpr):
@@ -127,8 +137,41 @@ class Let(NixComplexType):
 
     def dumps(self) -> str:
         """Serialize this let expression to Nix syntax."""
-        exprs = "\n".join([f"  {key} = {dumps(n)};" for key, n in self.exprs.items()])
-        return f"""let {exprs} in {dumps(self.result)}"""
+        from ..dsl.core import _indent
+        import textwrap
+
+        # Format each binding with proper indentation
+        bindings = []
+        for key, value in self.exprs.items():
+            value_str = dumps(value)
+            # Special handling for nested let expressions
+            if value_str.startswith("let\n"):
+                # Nested let should be indented as a block
+                bindings.append(f"  {key} =\n{textwrap.indent(value_str, '    ')};")
+            elif "\n" in value_str:
+                # For other multiline values, keep first line on same line as =
+                lines = value_str.split("\n")
+                if len(lines) > 1:
+                    first_line = lines[0]
+                    rest = "\n".join(lines[1:])
+                    bindings.append(
+                        f"  {key} = {first_line}\n{textwrap.indent(rest, '    ')};"
+                    )
+                else:
+                    bindings.append(f"  {key} = {value_str};")
+            else:
+                bindings.append(f"  {key} = {value_str};")
+
+        exprs = "\n".join(bindings)
+        result_str = dumps(self.result)
+
+        # Format the in clause properly
+        if "\n" in result_str and not result_str.startswith("("):
+            # Multiline result should be indented
+            return f"let\n{exprs}\nin\n{textwrap.indent(result_str, _indent)}"
+        else:
+            # Single line or already formatted result
+            return f"let\n{exprs}\nin\n{result_str}"
 
 
 def let(in_: NixExpr, **exprs: NixExpr) -> Let:

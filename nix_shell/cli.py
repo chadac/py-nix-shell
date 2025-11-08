@@ -27,6 +27,7 @@ class NixBuildArgs(TypedDict):
         expr (str): Nix expression to build.
         impure (bool): Whether to run nix in impure evaluation mode. Defaults to `False`.
         include (tuple[tuple[str, str]]): Equivalent to `--include`.
+        arg (dict[str, str]): Equivalent to `--arg`.
         arg_from_file (dict[str, Path]): Equivalent to `--arg-from-file`.
     """
 
@@ -36,6 +37,7 @@ class NixBuildArgs(TypedDict):
     expr: NotRequired[str]
     impure: NotRequired[bool]
     include: NotRequired[tuple[tuple[str, str], ...]]
+    arg: NotRequired[dict[str, str]]
     arg_from_file: NotRequired[dict[str, Path]]
 
 
@@ -54,6 +56,9 @@ def _parse_args(
             args += [params["installable"]]
     if params.get("impure", False):
         args += ["--impure"]
+    if args_dict := params.get("arg"):
+        for arg_name, arg_value in args_dict.items():
+            args += ["--arg", arg_name, arg_value]
     if files := params.get("arg_from_file"):
         for arg_name, path in files.items():
             args += ["--arg-from-file", arg_name, str(path)]

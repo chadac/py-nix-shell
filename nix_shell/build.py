@@ -8,7 +8,7 @@ import shlex
 import subprocess
 import sys
 from dataclasses import dataclass, field
-from functools import cached_property, lru_cache
+from functools import cached_property
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Callable, Self, TypeVar, Unpack
 
@@ -44,14 +44,8 @@ class NixBuild:
     )
 
     @classmethod
-    @lru_cache
     def create(cls: type[T], **params: Unpack[cli.NixBuildArgs]) -> T:
-        """
-        Create a new NixBuild instance.
-
-        This method is cached by the `params` key, which provides a significant
-        speedup when invoking multiple commands with the same Nix build.
-        """
+        """Create a new NixBuild instance."""
         return cls(params)
 
     @classmethod

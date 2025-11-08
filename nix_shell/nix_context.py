@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import base64
 from contextlib import contextmanager
 from contextvars import ContextVar
 from dataclasses import dataclass, field
@@ -16,9 +15,13 @@ if TYPE_CHECKING:
 
 def _mk_var_name(expr: Hashable) -> str:
     """Generate a unique variable name from a hashable expression."""
-    value = hash(expr)
-    hash_bytes = value.to_bytes(8, "big", signed=True)
-    return "var_" + base64.urlsafe_b64encode(hash_bytes).decode("ascii")
+    # Get the hash value as an integer, then convert to bytes
+    hash_value = hash(expr)
+    # Convert to bytes (8 bytes for 64-bit hash, signed)
+    hash_bytes = hash_value.to_bytes(8, "big", signed=True)
+    # Encode as base16 (hex) - only uses 0-9a-f characters
+    hex_string = hash_bytes.hex()
+    return "var_" + hex_string
 
 
 @dataclass
@@ -35,9 +38,21 @@ class NixContext:
     _params: dict[str, dsl.NixExpr | None] = field(default_factory=dict)
     _vars: dict[str, dsl.NixExpr] = field(default_factory=dict)
     _files: dict[Path, dsl.NixVar] = field(default_factory=dict)
-    
+
     # Cache configuration
+    disable_cache: bool = False
     cache_options: CacheOptions | None = None
+
+    def __post_init__(self) -> None:
+        """Initialize default variables including pkgs from py-nix-shell's locked nixpkgs."""
+        from nix_shell.flake import get_locked_from_py_nix_shell
+
+        # Initialize pkgs from py-nix-shell's locked nixpkgs
+        nixpkgs_locked = get_locked_from_py_nix_shell("nixpkgs")
+        # Convert FlakeRefLock to a proper flake URL string
+        flake_url = self._locked_to_url(nixpkgs_locked)
+        self["nixpkgs"] = dsl.builtins["getFlake"](flake_url)
+        self["pkgs"] = self["nixpkgs"]["legacyPackages"][cli.current_system()]
 
     def __getitem__(self, key: str) -> dsl.NixVar:
         """Get a variable by name from the context."""
@@ -97,12 +112,12 @@ class NixContext:
         args: cli.NixBuildArgs = {}
 
         if self._files:
-            args["arg_from_file"] = {
-                var.value: path for path, var in self._files.items()
-            }
+            # Use --arg to pass paths as Nix paths
+            args["arg"] = {var.value: f"./{path}" for path, var in self._files.items()}
+            # Set impure mode for local file access
+            args["impure"] = True
 
         return args
-    
 
 
 _global_context: ContextVar[NixContext] = ContextVar("nix_global_context")
@@ -114,7 +129,7 @@ def get_nix_context() -> NixContext:
         context = _global_context.get()
     except LookupError:
         context = None
-    
+
     if context is None:
         context = NixContext()
         _global_context.set(context)

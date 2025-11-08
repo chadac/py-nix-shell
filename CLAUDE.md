@@ -25,6 +25,10 @@ Recent changes:
 - All imports have been updated accordingly
 - Type names: use `NixExpr` (not `NixValue`), `NixCompoundType` (not `NixType`)
 
+## Type Annotations
+
+**Important**: Don't use string types to satisfy mypy. Use `from __future__ import annotations`. Fix your mistakes.
+
 ## Development Workflow
 
 1. Make code changes

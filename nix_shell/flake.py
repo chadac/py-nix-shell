@@ -7,7 +7,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import NotRequired, TypedDict
 
-from nix_shell import cli
+from nix_shell import cli, dsl
 from nix_shell.constants import PKG_FLAKE_LOCK
 from nix_shell.dsl import NixExpr
 
@@ -122,3 +122,75 @@ def get_locked_from_impure_nixpkgs() -> FlakeRefLock:
     locked = dict(cli.flake.metadata("nixpkgs")["locked"])
     locked.pop("__final", None)
     return locked  # type: ignore
+
+
+def import_flake_from_files(files: dict[str, dsl.NixVar]) -> dsl.NixExpr:
+    """
+    Create a Nix expression that behaves like builtins.getFlake on a virtual set of files.
+
+    This creates a store derivation containing the files and then manually evaluates
+    the flake.nix file with proper inputs, which is more reliable than trying to
+    use builtins.getFlake with store paths or external tools like call-flake.
+
+    Args:
+        files: Dict mapping relative file paths to NixVar objects representing the files
+               e.g., {"flake.nix": flake_nix_var, "flake.lock": flake_lock_var}
+
+    Returns:
+        NixExpr that evaluates to the same thing as builtins.getFlake would
+    """
+
+    from nix_shell.nix_context import get_nix_context
+
+    ctx = get_nix_context()
+
+    if "flake.nix" not in files:
+        raise ValueError("flake.nix file is required")
+
+    if "flake.lock" not in files:
+        raise ValueError("flake.lock file is required")
+
+    # Create symlink commands for each file
+    link_commands = []
+    for path, var in files.items():
+        # Use ${} for proper variable interpolation in the shell script
+        link_commands.append(f"ln -s ${{{var.value}}} $out/{path}")
+
+    # Build the shell script with proper formatting
+    shell_script_lines = ["mkdir -p $out"]
+    shell_script_lines.extend(link_commands)
+    shell_script = "\n".join(shell_script_lines)
+
+    # Manual flake evaluation - import flake.nix and call its outputs function
+    # This is the most reliable approach that works with store paths
+    virtual_flake = dsl.let(
+        # Create the virtual directory containing the flake files
+        flakeDir=dsl.call(
+            ctx["pkgs"]["runCommand"],
+            "virtual-flake",
+            {},
+            shell_script,
+        ),
+        # Import flake.nix and evaluate it manually
+        flakeNix=dsl.call(
+            dsl.raw("import"),
+            dsl.raw('((toString flakeDir) + "/flake.nix")')
+        ),
+        # Parse flake.lock for input information
+        flakeLock=dsl.call(
+            dsl.raw("builtins.fromJSON"),
+            dsl.call(
+                dsl.raw("builtins.readFile"),
+                dsl.raw('((toString flakeDir) + "/flake.lock")'),
+            ),
+        ),
+        # Construct inputs based on the lock file
+        inputs={
+            "nixpkgs": ctx["nixpkgs"],
+            "self": None,  # Self-reference handled specially (None becomes null)
+        },
+        # Call the flake outputs function
+        in_=dsl.call(dsl.v("flakeNix")["outputs"], dsl.v("inputs")),
+    )
+
+    return virtual_flake

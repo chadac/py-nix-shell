@@ -17,7 +17,7 @@ from nix_shell.constants import CACHE_ROOT, LOCAL_CACHE_ROOT
 
 class CacheOptions(TypedDict):
     """Cache configuration options."""
-    
+
     history: int
     use_global: bool
 
@@ -30,22 +30,25 @@ def use_cache(
 ) -> None:
     """
     Enable caching for a NixContext.
-    
+
     Creates a cache_options.json file that tells pynix to use caching by default.
-    
+
     Args:
         history: Number of recent builds to keep in history
         use_global: Whether to use CACHE_ROOT instead of LOCAL_CACHE_ROOT
         ctx: NixContext to enable caching for (defaults to current global context)
     """
     ctx = ctx or get_nix_context()
-    
+
+    if ctx.disable_cache:
+        return
+
     cache_options: CacheOptions = {
         "history": history,
         "use_global": use_global,
     }
     ctx.cache_options = cache_options
-    
+
     # Write cache options to file for persistence
     LOCAL_CACHE_ROOT.mkdir(parents=True, exist_ok=True)
     cache_options_file = LOCAL_CACHE_ROOT / "cache_options.json"
@@ -56,7 +59,7 @@ def use_cache(
 def load_cache_options() -> CacheOptions | None:
     """
     Load cache options from cache_options.json if it exists.
-    
+
     Returns:
         Cache options if file exists, None otherwise
     """
@@ -143,7 +146,7 @@ class CacheHistory:
         # Save the build files
         build.save_json(json_path)
         build.save_link(profile_path)
-        
+
         # Create entry from build (always uses build_id)
         entry: CacheHistoryEntry = {
             "build_id": build_id,
@@ -183,13 +186,13 @@ class CacheHistory:
     def get(self, build: NixBuild) -> CacheHistoryEntry | None:
         """Get an entry by build object using its build_id."""
         build_id = build.build_id
-        
+
         # Find entry by build_id
         for entry in self._entries:
             if entry["build_id"] == build_id:
                 return entry
         return None
-    
+
     def lookup(self, cache_key: str) -> CacheHistoryEntry | None:
         """Get an entry by cache key, resolving aliases if necessary."""
         # First check if cache_key is an alias

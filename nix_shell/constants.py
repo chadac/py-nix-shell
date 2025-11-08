@@ -1,7 +1,6 @@
 """Constants and configuration paths for py-nix-shell."""
 
 import os
-import sys
 from pathlib import Path
 
 _DEFAULT_LOCAL_CACHE = Path.home() / ".cache" / "py-nix-shell" / "local"

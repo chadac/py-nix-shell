@@ -1,4 +1,5 @@
-from nix_shell import cache
+from nix_shell import cache, flake_nix
+from nix_shell.cache import use_cache
 from nix_shell._global_subprocess import (
     Popen,
     call,
@@ -28,4 +29,6 @@ __all__ = [
     "from_flake",
     "context",
     "cache",
+    "flake_nix",
+    "use_cache",
 ]
