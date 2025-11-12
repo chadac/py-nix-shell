@@ -1,4 +1,4 @@
-from nix_shell.flake import get_locked_from_impure_nixpkgs
+from nix_shell.utils.flake import get_locked_from_impure_nixpkgs
 
 # def test_fetch_tree():
 #     # This test is disabled because to_fetch_tree function no longer exists

@@ -8,14 +8,14 @@ from typing import Any, Literal
 
 from nix_shell import dsl
 from nix_shell.cli import current_system
-from nix_shell.dsl_utils import (
+from nix_shell.module import Module, ModuleExpr, ModuleSystem, ModuleType
+from nix_shell.utils.dsl import (
     NixContext,
     get_nix_context,
     import_flake,
     import_nixpkgs,
 )
-from nix_shell.flake import FlakeRefLock, get_locked_from_py_nix_shell
-from nix_shell.module import Module, ModuleExpr, ModuleSystem, ModuleType
+from nix_shell.utils.flake import FlakeRefLock, get_locked_from_py_nix_shell
 
 
 @dataclass

@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from nix_shell.utils import format_nix
+from nix_shell.utils.path import format_nix
 
 
 def assert_match_nix(snapshot, expr_str: str, filename: str | Path) -> None:

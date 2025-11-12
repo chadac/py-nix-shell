@@ -12,5 +12,7 @@ nix_shell.use_cache(
     history=5,
 )
 
-flake_nix.init(minimal=True, files=["devenv.nix"])  # initialize only with the flake.nix and flake.lock files
+flake_nix.init(
+    minimal=True, files=["devenv.nix"]
+)  # initialize only with the flake.nix and flake.lock files
 shell = flake_nix.devshell(target="devShells.default")

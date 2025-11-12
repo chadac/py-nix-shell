@@ -7,7 +7,7 @@ from functools import cache
 from pathlib import Path
 from typing import NotRequired, TypedDict, Unpack
 
-from nix_shell.utils import format_nix
+from nix_shell.utils.path import format_nix
 
 from .exceptions import wrap_subprocess_error
 

@@ -76,6 +76,105 @@ class Flake:
     output: NixExpr
 
 
+class FlakeLockNode(TypedDict, total=False):
+    """
+    Represents a node in a flake.lock file.
+
+    Based on the Nix flake.lock specification, each node can either be:
+    - A root node (has 'inputs' field)
+    - A locked input node (has 'locked' field)
+    - A follows node (has 'follows' field)
+    """
+
+    # For root nodes and input nodes with sub-inputs
+    inputs: NotRequired[dict[str, str | list[str]]]
+
+    # For locked input nodes - contains the actual flake reference
+    locked: NotRequired[FlakeRefLock]
+
+    # For nodes that follow another input
+    follows: NotRequired[str | list[str]]
+
+    # Original flake reference before locking
+    original: NotRequired[dict[str, str]]
+
+    # Flake input name (for reference)
+    flake: NotRequired[bool]
+
+
+class FlakeLock(TypedDict):
+    """
+    Represents a complete flake.lock file structure.
+
+    Based on the Nix flake.lock specification:
+    https://nixos.org/manual/nix/stable/command-ref/new-cli/nix3-flake.html#lock-files
+    """
+
+    # All nodes in the lock file (inputs + root)
+    nodes: dict[str, FlakeLockNode]
+
+    # Name of the root node (usually "root")
+    root: str
+
+    # Lock file format version
+    version: int
+
+
+# Type alias for importing flake.lock files
+FlakeLockImport = FlakeLock
+
+
+def load_flake_lock(flake_lock_path: Path | str) -> FlakeLock:
+    """
+    Load and parse a flake.lock file into a FlakeLock TypedDict.
+
+    Args:
+        flake_lock_path: Path to the flake.lock file
+
+    Returns:
+        FlakeLock object with parsed content
+
+    Raises:
+        FileNotFoundError: If flake.lock file doesn't exist
+        json.JSONDecodeError: If flake.lock file is invalid JSON
+        KeyError: If required fields are missing from flake.lock
+    """
+    with open(flake_lock_path, "r") as f:
+        lock_data = json.load(f)
+
+    # Validate required fields
+    if "nodes" not in lock_data:
+        raise KeyError("flake.lock missing required 'nodes' field")
+    if "root" not in lock_data:
+        raise KeyError("flake.lock missing required 'root' field")
+    if "version" not in lock_data:
+        raise KeyError("flake.lock missing required 'version' field")
+
+    return cast(FlakeLock, lock_data)
+
+
+def get_input_locked_refs(flake_lock: FlakeLock) -> dict[str, FlakeRefLock]:
+    """
+    Extract all locked input references from a FlakeLock.
+
+    Args:
+        flake_lock: Parsed flake.lock data
+
+    Returns:
+        Dictionary mapping input names to their FlakeRefLock data
+    """
+    locked_refs: dict[str, FlakeRefLock] = {}
+
+    for node_name, node in flake_lock["nodes"].items():
+        if node_name == flake_lock["root"]:
+            continue  # Skip root node
+
+        if "locked" in node:
+            locked_refs[node_name] = node["locked"]
+
+    return locked_refs
+
+
 def fetch_locked_from_flake_ref(ref: FlakeRef) -> FlakeRefLock:
     """
     Convert a [flake reference](https://nix.dev/manual/nix/2.28/command-ref/new-cli/nix3-flake.html#url-like-syntax) into a proper locked reference.

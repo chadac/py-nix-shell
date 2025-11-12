@@ -18,8 +18,8 @@ if TYPE_CHECKING:
 import nix_shell.cache
 from nix_shell import cli, dsl
 from nix_shell.constants import LOCAL_CACHE_ROOT
-from nix_shell.flake import FlakeRef, FlakeRefLock, fetch_locked_from_flake_ref
 from nix_shell.nix_context import NixContext, get_nix_context
+from nix_shell.utils.flake import FlakeRef, FlakeRefLock, fetch_locked_from_flake_ref
 
 T = TypeVar("T", bound="NixBuild")
 

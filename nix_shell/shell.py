@@ -2,7 +2,7 @@ from pathlib import Path
 
 from nix_shell import dsl
 from nix_shell.cli import current_system
-from nix_shell.dsl_utils import NixContext
+from nix_shell.utils.dsl import NixContext
 
 
 def use_shell_nix(

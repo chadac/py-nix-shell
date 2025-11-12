@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-from nix_shell.utils import find_shared_root
+from nix_shell.utils.path import find_shared_root
 
 
 def test_find_shared_root_empty_list():

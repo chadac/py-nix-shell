@@ -294,7 +294,7 @@ def cmd_print_dev_env(shell: NixShell) -> None:
 
 def cmd_show(shell: NixShell) -> None:
     """Print the Nix expression being evaluated."""
-    from nix_shell.utils import format_nix
+    from nix_shell.utils.path import format_nix
 
     if "expr" in shell.params:
         print(format_nix(shell.params["expr"]))

@@ -61,7 +61,7 @@ def init(
         flake_lock_var = ctx.path(flake_lock_path)
 
         # Import the flake using our file-based evaluation
-        from nix_shell.flake import import_flake_from_files
+        from nix_shell.utils.flake import import_flake_from_files
 
         flake_files = {
             "flake.nix": flake_nix_var,

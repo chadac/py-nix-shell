@@ -8,10 +8,7 @@ shell = nix_shell.mk_shell(packages=["curl"])
 
 # Use internal _load method with custom key
 cached_shell = nix_shell.cache._load(
-    shell,
-    cache_key="my-custom-shell-key",
-    history=5,
-    use_global_cache=False
+    shell, cache_key="my-custom-shell-key", history=5, use_global_cache=False
 )
 
 print("Internal _load method with custom cache key works!")

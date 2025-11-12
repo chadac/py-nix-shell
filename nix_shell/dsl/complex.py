@@ -32,16 +32,12 @@ def raw(value: str | Raw) -> Raw:
 class NixVar(Raw):
     """A Nix variable that supports attribute access and function calls."""
 
-    def __getitem__(self, name: str, /) -> NixVar:
+    def __getitem__(self, name: str | NixVar, /) -> NixVar:
         """Access an attribute of this variable."""
-        return NixVar(f"{self.value}.{name}")
-
-    def __getattr__(self, name: str, /) -> NixVar:
-        """Access an attribute of this variable via dot notation."""
-        if name == "value":
-            return self.__dict__["value"]
+        if isinstance(name, str):
+            return NixVar(f"{self.value}.{name}")
         else:
-            return self[name]
+            return NixVar(f"{self.value}.${{{name.value}}}")
 
     def __call__(self, *args: NixExpr) -> tuple:
         """Call this variable as a function with the given arguments."""

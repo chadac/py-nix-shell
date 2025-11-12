@@ -8,9 +8,9 @@ shell = nix_shell.mk_shell(packages=["curl"])
 
 # Load/cache it with history tracking
 cached_shell = nix_shell.cache.load(
-    shell, 
+    shell,
     history=5,  # Keep 5 recent builds
-    use_global_cache=False  # Use local cache
+    use_global_cache=False,  # Use local cache
 )
 
 print("Cache module implemented successfully!")
